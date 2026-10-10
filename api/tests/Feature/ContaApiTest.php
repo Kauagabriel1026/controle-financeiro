@@ -6,6 +6,7 @@ use App\Models\Categoria;
 use App\Models\Conta;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -212,5 +213,27 @@ class ContaApiTest extends TestCase
         $this->postJson("/api/contas/{$alheia->id}/pagar")->assertNotFound();
 
         $this->assertDatabaseHas('contas', ['id' => $alheia->id, 'pago_em' => null]);
+    }
+
+    public function test_conta_que_vence_hoje_continua_pendente_ate_o_fim_do_dia_no_brasil(): void
+    {
+        // 22h30 em Brasília já é o dia seguinte em UTC; o status segue o dia do Brasil.
+        $this->travelTo(Carbon::parse('2026-10-09 22:30:00', 'America/Sao_Paulo'));
+
+        $conta = Conta::factory()->for($this->user)->create(['vencimento' => '2026-10-09']);
+
+        $this->getJson("/api/contas/{$conta->id}")->assertJsonPath('data.status', 'pendente');
+        $this->getJson('/api/contas?status=vencida')->assertJsonCount(0, 'data');
+
+        $this->postJson("/api/contas/{$conta->id}/pagar", ['pago_em' => '2026-10-09'])
+            ->assertOk()
+            ->assertJsonPath('data.pago_em', '2026-10-09');
+    }
+
+    public function test_conta_inexistente_responde_404_sem_expor_detalhes_internos(): void
+    {
+        $this->getJson('/api/contas/999999')
+            ->assertNotFound()
+            ->assertExactJson(['message' => 'Registro não encontrado.']);
     }
 }

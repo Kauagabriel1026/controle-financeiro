@@ -16,8 +16,11 @@ Route::get('/health', function () {
     ]);
 });
 
-Route::post('/registrar', [AuthController::class, 'registrar']);
-Route::post('/login', [AuthController::class, 'login']);
+// Limite de 10 tentativas por minuto por IP, contra adivinhação de senha.
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/registrar', [AuthController::class, 'registrar']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/eu', [AuthController::class, 'eu']);

@@ -90,4 +90,19 @@ class AuthTest extends TestCase
 
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
+
+    public function test_login_bloqueia_apos_dez_tentativas_em_um_minuto(): void
+    {
+        for ($tentativa = 1; $tentativa <= 10; $tentativa++) {
+            $this->postJson('/api/login', [
+                'email' => 'ninguem@example.com',
+                'password' => 'senha-errada',
+            ])->assertUnprocessable();
+        }
+
+        $this->postJson('/api/login', [
+            'email' => 'ninguem@example.com',
+            'password' => 'senha-errada',
+        ])->assertTooManyRequests();
+    }
 }
