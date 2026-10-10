@@ -52,6 +52,8 @@ export function AuthProvider({ children }) {
       conferirSessao,
       entrar: async (dados) => iniciar(await api('/login', { metodo: 'POST', corpo: dados })),
       cadastrar: async (dados) => iniciar(await api('/registrar', { metodo: 'POST', corpo: dados })),
+      // Entra em uma conta de visitante, criada na hora com dados de exemplo.
+      demonstrar: async () => iniciar(await api('/demonstracao', { metodo: 'POST' })),
       // Sai na hora neste navegador e avisa a API em seguida. O pedido sai antes
       // de o token ser apagado e continua mesmo se a página for fechada.
       sair: async () => {

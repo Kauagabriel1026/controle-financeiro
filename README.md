@@ -52,6 +52,7 @@ Todas as rotas ficam em `http://localhost:8000/api`. As rotas marcadas com 🔒 
 | --- | --- | --- |
 | POST | `/registrar` | Cria o usuário, com as categorias sugeridas, e devolve um token |
 | POST | `/login` | Devolve um token |
+| POST | `/demonstracao` | Cria uma conta de visitante com dados de exemplo e devolve um token |
 | GET | `/eu` 🔒 | Dados do usuário logado |
 | POST | `/logout` 🔒 | Invalida o token usado |
 
@@ -101,6 +102,26 @@ curl -X POST http://localhost:8000/api/contas \
   -d '{"tipo":"pagar","descricao":"Aluguel","valor":1500,"vencimento":"2026-11-10"}'
 ```
 
+## Produção
+
+A API tem uma imagem própria para produção, em `api/Dockerfile.prod`: Apache com PHP, código e dependências dentro da imagem, modo debug desligado e configuração em cache. O front-end é gerado com `npm run build` e servido como arquivos estáticos.
+
+Variáveis de ambiente da API:
+
+| Variável | Para que serve |
+| --- | --- |
+| `APP_KEY` | Segredo da aplicação |
+| `DB_URL` | Endereço do PostgreSQL, no formato `postgresql://usuario:senha@host/banco?sslmode=require` |
+| `CORS_ALLOWED_ORIGINS` | Endereço do front-end, o único site autorizado a chamar a API pelo navegador |
+
+Variável de ambiente do front-end, lida no momento do build:
+
+| Variável | Para que serve |
+| --- | --- |
+| `VITE_API_URL` | Endereço da API, terminando em `/api` |
+
+O arquivo `render.yaml` descreve a API para o Render e o `web/vercel.json` configura o front-end no Vercel.
+
 ## Comandos úteis
 
 ```bash
@@ -128,7 +149,8 @@ docker compose down
 │   ├── database/         # Migrations, factories e seeders
 │   ├── routes/api.php    # Rotas da API
 │   ├── tests/            # Testes automatizados
-│   └── Dockerfile
+│   ├── Dockerfile        # Ambiente de desenvolvimento
+│   └── Dockerfile.prod   # Imagem de produção
 ├── web/                  # Front-end em React
 │   └── src/
 │       ├── pages/        # Telas: login, painel, contas e categorias
@@ -136,6 +158,7 @@ docker compose down
 │       ├── api.js        # Chamadas à API, com o token do usuário
 │       └── auth.jsx      # Sessão do usuário logado
 ├── docker-compose.yml    # Sobe a API, o PostgreSQL e o front-end
+├── render.yaml           # Publicação da API no Render
 └── .github/workflows/    # Testes automáticos a cada push
 ```
 
@@ -148,3 +171,4 @@ docker compose down
 - [x] Fluxo de caixa por período
 - [x] Front-end em React
 - [x] Contas recorrentes, exportação em CSV e gastos e ganhos por categoria
+- [x] Imagem de produção, CORS restrito e conta de demonstração

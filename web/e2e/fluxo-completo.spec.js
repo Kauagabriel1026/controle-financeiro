@@ -224,5 +224,12 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(page.getByRole('listitem')).toHaveCount(8)
   await expect(page.getByRole('listitem').filter({ hasText: 'Reserva' })).toHaveCount(0)
 
+  // --- Demonstração: entra sem cadastro, em uma conta de visitante ---
+  await page.getByRole('button', { name: 'Sair' }).click()
+  await page.getByRole('button', { name: 'Ver demonstração' }).click()
+  await expect(page.getByRole('note')).toContainText('conta de demonstração')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(nomeDoMes(hoje.slice(0, 7)))
+  await expect(page.locator('.sessao')).toContainText('Visitante')
+
   expect(erros).toEqual([])
 })

@@ -21,6 +21,7 @@ Route::get('/health', function () {
 Route::middleware('throttle:10,1')->group(function () {
     Route::post('/registrar', [AuthController::class, 'registrar']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/demonstracao', [AuthController::class, 'demonstracao']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

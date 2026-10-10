@@ -192,3 +192,87 @@ jobs:
           registro="${registro//'%'/'%25'}"
           registro="${registro//$'\n'/'%0A'}"
           echo "::error title=Logs do Docker Compose::$registro"
+
+  # Monta a imagem de produção e confere, com ela no ar, o que muda em relação
+  # ao ambiente de desenvolvimento: sem modo debug, CORS restrito e demonstração.
+  producao:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: controle_financeiro
+          POSTGRES_USER: financeiro
+          POSTGRES_PASSWORD: financeiro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U financeiro -d controle_financeiro"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      API: http://127.0.0.1:10000/api
+      FRONT: https://kamel.example
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Montar a imagem de produção
+        run: docker build --file api/Dockerfile.prod --tag kamel-api api
+
+      - name: Subir a API como na hospedagem
+        run: |
+          docker run --detach --name kamel-api --network host \
+            --env PORT=10000 \
+            --env APP_KEY=um-segredo-qualquer-de-teste \
+            --env DB_URL=postgresql://financeiro:financeiro@127.0.0.1:5432/controle_financeiro \
+            --env CORS_ALLOWED_ORIGINS=$FRONT \
+            kamel-api
+          curl --silent --fail --retry 30 --retry-delay 2 --retry-all-errors $API/health
+
+      - name: Conferir que o modo debug está desligado
+        run: |
+          ambiente=$(docker exec kamel-api php -r 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); echo config("app.env")." debug=".var_export(config("app.debug"), true);')
+          echo "::notice title=Ambiente da imagem de produção::$ambiente"
+          test "$ambiente" = "production debug=false"
+
+          # Um erro interno não pode devolver detalhes do código.
+          corpo=$(curl --silent $API/rota-que-nao-existe)
+          echo "::notice title=Resposta a uma rota inexistente::$corpo"
+          ! echo "$corpo" | grep -qiE 'exception|trace|vendor/'
+
+      - name: Conferir o CORS
+        run: |
+          permitido=$(curl --silent --output /dev/null --dump-header - --header "Origin: $FRONT" $API/health | grep -i '^access-control-allow-origin' | tr -d '\r' || true)
+          outro=$(curl --silent --output /dev/null --dump-header - --header "Origin: https://outro-site.example" $API/health | grep -i '^access-control-allow-origin' | tr -d '\r' || true)
+          echo "::notice title=CORS::front: [$permitido] | outro site: [$outro]"
+          echo "$permitido" | grep -qi "$FRONT"
+          ! echo "$outro" | grep -qi "outro-site.example"
+
+      - name: Conferir a demonstração
+        run: |
+          token=$(curl --silent --fail --request POST --header "Accept: application/json" $API/demonstracao | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])")
+          vencidas=$(curl --silent --fail --header "Accept: application/json" --header "Authorization: Bearer $token" "$API/contas?status=vencida" | python3 -c "import json,sys; print(json.load(sys.stdin)['meta']['total'])")
+          contas=$(curl --silent --fail --header "Accept: application/json" --header "Authorization: Bearer $token" "$API/contas" | python3 -c "import json,sys; print(json.load(sys.stdin)['meta']['total'])")
+          echo "::notice title=Demonstração na imagem de produção::$contas contas, $vencidas vencida"
+          test "$contas" = "61"
+          test "$vencidas" = "1"
+
+      - name: Medir o tempo de resposta
+        run: |
+          tempos=""
+          for i in $(seq 1 10); do
+            tempos="$tempos $(curl --silent --output /dev/null --write-out '%{time_total}' $API/health)"
+          done
+          echo "::notice title=Tempo de resposta da imagem de produção (10 chamadas, em segundos)::$tempos"
+
+      - name: Mostrar os logs se algo falhar
+        if: failure()
+        run: |
+          registro=$(docker logs kamel-api 2>&1 | tail -c 3500)
+          registro="${registro//'%'/'%25'}"
+          registro="${registro//$'\n'/'%0A'}"
+          echo "::error title=Logs da imagem de produção::$registro"

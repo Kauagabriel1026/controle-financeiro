@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Support\CategoriasSugeridas;
+use App\Support\ContaDeDemonstracao;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -45,6 +46,17 @@ class AuthController extends Controller
         return $this->respostaComToken($user);
     }
 
+    /**
+     * Cria uma conta de visitante já com dados de exemplo e entra nela,
+     * para quem quer conhecer o sistema sem se cadastrar.
+     */
+    public function demonstracao(): JsonResponse
+    {
+        ContaDeDemonstracao::apagarAntigas();
+
+        return $this->respostaComToken(ContaDeDemonstracao::criar(), 201);
+    }
+
     public function eu(Request $request): JsonResponse
     {
         return response()->json($this->dadosDoUsuario($request->user()));
@@ -74,6 +86,7 @@ class AuthController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'demonstracao' => (bool) $user->demonstracao,
         ];
     }
 }

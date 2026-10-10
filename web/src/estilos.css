@@ -412,6 +412,24 @@ select {
   font-weight: 600;
 }
 
+.entrada-dica {
+  margin: -0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+
+/* Aviso no topo das telas para quem entrou pela demonstração. */
+.faixa-demonstracao {
+  margin: 0 0 1.5rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--linha);
+  border-left: 4px solid var(--azul);
+  border-radius: var(--raio);
+  background: var(--azul-claro);
+  color: var(--tinta);
+  font-size: 0.875rem;
+}
+
 /* ---------- Painel ---------- */
 
 .troca-mes {

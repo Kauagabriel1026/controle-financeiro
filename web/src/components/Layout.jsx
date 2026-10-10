@@ -24,6 +24,11 @@ export default function Layout() {
       </aside>
 
       <main className="conteudo">
+        {usuario.demonstracao && (
+          <p className="faixa-demonstracao" role="note">
+            Você está em uma conta de demonstração. Os dados são de exemplo e ficam guardados por 24 horas.
+          </p>
+        )}
         <Outlet />
       </main>
     </div>

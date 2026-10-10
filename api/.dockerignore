@@ -1,0 +1,7 @@
+vendor
+.env
+.git
+.phpunit.cache
+storage/logs/*.log
+tests
+phpunit.xml
