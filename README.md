@@ -9,6 +9,7 @@ Sistema de contas a pagar e a receber com fluxo de caixa por período. API em La
 - PHP 8.3 e Laravel 13
 - PostgreSQL 16
 - Docker e Docker Compose
+- Laravel Sanctum para autenticação por token
 - PHPUnit e GitHub Actions
 
 ## Como rodar
@@ -27,6 +28,54 @@ Para conferir, acesse `http://localhost:8000/api/health`. A resposta esperada é
 
 ```json
 { "status": "ok", "banco": "pgsql" }
+```
+
+## API
+
+Todas as rotas ficam em `http://localhost:8000/api`. As rotas marcadas com 🔒 exigem o cabeçalho `Authorization: Bearer <token>`, com o token devolvido no cadastro ou no login.
+
+### Autenticação
+
+| Método | Rota | O que faz |
+| --- | --- | --- |
+| POST | `/registrar` | Cria o usuário e devolve um token |
+| POST | `/login` | Devolve um token |
+| GET | `/eu` 🔒 | Dados do usuário logado |
+| POST | `/logout` 🔒 | Invalida o token usado |
+
+### Categorias 🔒
+
+| Método | Rota | O que faz |
+| --- | --- | --- |
+| GET | `/categorias` | Lista as categorias do usuário |
+| POST | `/categorias` | Cria uma categoria |
+| PUT | `/categorias/{id}` | Renomeia uma categoria |
+| DELETE | `/categorias/{id}` | Exclui uma categoria |
+
+### Contas 🔒
+
+| Método | Rota | O que faz |
+| --- | --- | --- |
+| GET | `/contas` | Lista as contas, com paginação e filtros |
+| POST | `/contas` | Cria uma conta a pagar ou a receber |
+| GET | `/contas/{id}` | Mostra uma conta |
+| PUT | `/contas/{id}` | Edita uma conta |
+| DELETE | `/contas/{id}` | Exclui uma conta |
+| POST | `/contas/{id}/pagar` | Dá baixa no pagamento |
+| POST | `/contas/{id}/estornar` | Desfaz a baixa |
+
+Filtros de `GET /contas`: `tipo` (`pagar` ou `receber`), `status` (`pendente`, `paga` ou `vencida`), `de` e `ate` (período de vencimento, no formato `AAAA-MM-DD`).
+
+Cada usuário só enxerga as próprias contas e categorias. O status é calculado: `paga` quando há data de pagamento, `vencida` quando o vencimento já passou e `pendente` nos demais casos.
+
+Exemplo de criação de conta:
+
+```bash
+curl -X POST http://localhost:8000/api/contas \
+  -H "Authorization: Bearer SEU_TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"tipo":"pagar","descricao":"Aluguel","valor":1500,"vencimento":"2026-11-10"}'
 ```
 
 ## Comandos úteis
@@ -59,7 +108,7 @@ docker compose down
 
 - [x] Base do projeto: Laravel, PostgreSQL, Docker e testes automáticos
 - [x] Banco de dados: categorias e contas
-- [ ] API de contas a pagar e a receber, com baixa de pagamento
-- [ ] Login, com cada usuário vendo só as próprias contas
+- [x] API de contas a pagar e a receber, com baixa de pagamento
+- [x] Login, com cada usuário vendo só as próprias contas
 - [ ] Fluxo de caixa por período
 - [ ] Front-end em React
