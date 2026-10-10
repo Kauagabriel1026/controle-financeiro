@@ -2,7 +2,11 @@
 
 Sistema de contas a pagar e a receber com fluxo de caixa por período. API em Laravel com PostgreSQL e front-end em React.
 
-> Projeto em desenvolvimento. O andamento está na seção [Etapas](#etapas).
+![Painel com o resumo do mês e o fluxo de caixa de seis meses](docs/painel.png)
+
+![Lista de contas com filtros por mês, tipo e situação](docs/contas.png)
+
+As imagens mostram o sistema com dados de exemplo.
 
 ## Tecnologias
 
@@ -10,7 +14,8 @@ Sistema de contas a pagar e a receber com fluxo de caixa por período. API em La
 - PostgreSQL 16
 - Docker e Docker Compose
 - Laravel Sanctum para autenticação por token
-- PHPUnit e GitHub Actions
+- React 19 com Vite e React Router
+- PHPUnit, Vitest e GitHub Actions
 
 ## Como rodar
 
@@ -22,9 +27,14 @@ cd controle-financeiro
 docker compose up --build
 ```
 
-Na primeira execução o contêiner instala as dependências, gera a chave da aplicação e cria as tabelas no banco. Quando aparecer `Server running on [http://0.0.0.0:8000]`, a API está no ar.
+Na primeira execução os contêineres instalam as dependências, geram a chave da aplicação e criam as tabelas no banco. Depois disso:
 
-Para conferir, acesse `http://localhost:8000/api/health`. A resposta esperada é:
+- Sistema: `http://localhost:5173`
+- API: `http://localhost:8000/api`
+
+Abra o sistema, clique em **Criar conta** e cadastre um usuário para começar.
+
+Para conferir só a API, acesse `http://localhost:8000/api/health`. A resposta esperada é:
 
 ```json
 { "status": "ok", "banco": "pgsql" }
@@ -89,8 +99,11 @@ curl -X POST http://localhost:8000/api/contas \
 ## Comandos úteis
 
 ```bash
-# Rodar os testes
+# Rodar os testes da API
 docker compose exec api php artisan test
+
+# Rodar os testes do front-end
+docker compose exec web npm test
 
 # Criar as tabelas do zero
 docker compose exec api php artisan migrate:fresh
@@ -108,7 +121,13 @@ docker compose down
 │   ├── routes/api.php    # Rotas da API
 │   ├── tests/            # Testes automatizados
 │   └── Dockerfile
-├── docker-compose.yml    # Sobe a API e o PostgreSQL
+├── web/                  # Front-end em React
+│   └── src/
+│       ├── pages/        # Telas: login, painel, contas e categorias
+│       ├── components/   # Layout, formulário de conta e gráfico
+│       ├── api.js        # Chamadas à API, com o token do usuário
+│       └── auth.jsx      # Sessão do usuário logado
+├── docker-compose.yml    # Sobe a API, o PostgreSQL e o front-end
 └── .github/workflows/    # Testes automáticos a cada push
 ```
 
@@ -119,4 +138,4 @@ docker compose down
 - [x] API de contas a pagar e a receber, com baixa de pagamento
 - [x] Login, com cada usuário vendo só as próprias contas
 - [x] Fluxo de caixa por período
-- [ ] Front-end em React
+- [x] Front-end em React
