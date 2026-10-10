@@ -52,9 +52,12 @@ export function AuthProvider({ children }) {
       conferirSessao,
       entrar: async (dados) => iniciar(await api('/login', { metodo: 'POST', corpo: dados })),
       cadastrar: async (dados) => iniciar(await api('/registrar', { metodo: 'POST', corpo: dados })),
+      // Sai na hora neste navegador e avisa a API em seguida. O pedido sai antes
+      // de o token ser apagado e continua mesmo se a página for fechada.
       sair: async () => {
-        await api('/logout', { metodo: 'POST' }).catch(() => {})
+        const pedido = api('/logout', { metodo: 'POST', manterVivo: true }).catch(() => {})
         encerrar()
+        await pedido
       },
     }
   }, [usuario, carregando, falhaDeConexao, conferirSessao, encerrar])

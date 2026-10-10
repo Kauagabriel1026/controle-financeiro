@@ -32,7 +32,7 @@ export function salvarToken(token) {
  * resposta e transforma qualquer falha em ErroApi, com a mensagem pronta
  * para mostrar na tela.
  */
-export async function api(caminho, { metodo = 'GET', corpo, query = {} } = {}) {
+export async function api(caminho, { metodo = 'GET', corpo, query = {}, manterVivo = false } = {}) {
   const url = new URL(BASE + caminho)
 
   for (const [chave, valor] of Object.entries(query)) {
@@ -54,6 +54,7 @@ export async function api(caminho, { metodo = 'GET', corpo, query = {} } = {}) {
       method: metodo,
       headers,
       body: corpo ? JSON.stringify(corpo) : undefined,
+      keepalive: manterVivo,
     })
   } catch {
     throw new ErroApi(0, 'Não foi possível conectar à API. Confira se ela está no ar.')

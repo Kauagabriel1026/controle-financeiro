@@ -170,6 +170,7 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
 
   // --- Isolamento: outro usuário não vê nada da Ana ---
   await page.getByRole('button', { name: 'Sair' }).click()
+  await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible()
   await criarUsuario(page, 'Bruno')
   await page.getByRole('link', { name: 'Contas' }).click()
   await page.getByRole('button', { name: 'Ver todos os meses' }).click()
