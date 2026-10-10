@@ -412,124 +412,257 @@ select {
   font-weight: 600;
 }
 
-/* ---------- Painel: a conta do mês ---------- */
+/* ---------- Painel ---------- */
 
-.equacao {
+.troca-mes {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 0.75rem 1.75rem;
-  padding: 1.5rem 1.75rem;
-  border: 1px solid var(--linha);
-  border-radius: 14px;
-  background: var(--superficie);
+  align-items: center;
+  gap: 0.625rem;
 }
 
-.equacao > div {
+.troca-mes h1 {
+  min-width: 13.5rem;
+  text-align: center;
+}
+
+.troca-mes .botao-texto {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.cartao,
+.indicador {
+  border: 1px solid var(--linha);
+  border-radius: 16px;
+  background: var(--superficie);
+  box-shadow: 0 1px 2px rgb(15 36 64 / 0.04);
+}
+
+.cartao {
+  min-width: 0;
+  padding: 1.375rem 1.5rem 1.5rem;
+}
+
+.cartao h2 {
+  margin-bottom: 1rem;
+}
+
+.cartao .vazio {
+  padding: 1rem 0;
+}
+
+/* Os quatro números do mês. A faixa colorida à esquerda diz do que se trata. */
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.indicador {
+  position: relative;
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.125rem 1.25rem 1.125rem 1.5rem;
+  overflow: hidden;
 }
 
-.equacao .rotulo {
+.indicador::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: #9fb0c5;
+}
+
+.indicador.receber::before {
+  background: var(--receber);
+}
+
+.indicador.pagar::before {
+  background: var(--pagar);
+}
+
+.indicador.saldo::before {
+  background: var(--marinho);
+}
+
+.indicador.negativo::before {
+  background: var(--vencida);
+}
+
+.indicador .rotulo {
   font-size: 0.875rem;
   color: var(--tinta-suave);
 }
 
-.equacao strong {
-  font-size: 1.875rem;
-  font-weight: 600;
-  line-height: 1.25;
+.indicador strong {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }
 
-.equacao .detalhe {
+.indicador.negativo strong {
+  color: var(--vencida);
+}
+
+.indicador .detalhe {
   font-size: 0.8125rem;
   color: var(--tinta-suave);
 }
 
-.equacao .operador {
-  margin-top: 1.25rem;
-  font-size: 1.875rem;
-  line-height: 1.25;
-  color: #9fb0c5;
+.indicador a.detalhe {
+  color: var(--azul-escuro);
+  font-weight: 600;
+}
+
+.indicador .trilho {
+  margin-top: 0.375rem;
+}
+
+/* Trilho e preenchimento, usados nos medidores e nas barras de categoria. */
+.trilho {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--papel);
+  overflow: hidden;
+}
+
+.preenchido {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--pagar);
+}
+
+.preenchido.receber {
+  background: var(--receber);
 }
 
 .negativo {
   color: var(--vencida);
 }
 
-.alerta {
+.grade-painel {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1rem;
   margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  border-left: 3px solid var(--vencida);
-  border-radius: 0 var(--raio) var(--raio) 0;
-  background: var(--superficie);
+}
+
+/* Gastos e ganhos dividem a linha de baixo em partes iguais. */
+.grade-painel > .cartao:nth-child(n + 3) {
+  grid-column: span 1;
+}
+
+/* ---------- Próximas contas ---------- */
+
+.proximas {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.proximas li {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+}
+
+.proximas li + li {
+  border-top: 1px solid var(--linha);
+}
+
+.proximas .dia {
+  padding: 0.25rem 0;
+  border-radius: 8px;
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.proximas .descricao {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.proximas .nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.proximas .tipo {
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+
+.proximas .valor {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Gastos e ganhos por categoria ---------- */
 
-.lado-a-lado {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 0 1.5rem;
-  align-items: start;
+.total-categorias {
+  margin: -0.5rem 0 1rem;
+  color: var(--tinta-suave);
+}
+
+.total-categorias strong {
+  color: var(--tinta);
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .totais {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
-  align-items: center;
-  gap: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
   margin: 0;
-  padding: 1.25rem 1.5rem;
-  border: 1px solid var(--linha);
-  border-radius: 14px;
-  background: var(--superficie);
+  padding: 0;
   list-style: none;
 }
 
 .totais li {
-  display: contents;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: 0.375rem 1rem;
 }
 
-.totais .trilho {
-  height: 12px;
-  border-radius: 4px;
-  background: var(--papel);
-}
-
-.totais .preenchido {
-  display: block;
-  height: 100%;
-  min-width: 2px;
-  border-radius: 4px;
-  background: var(--pagar);
-}
-
-.totais .preenchido.receber {
-  background: var(--receber);
-}
-
-.totais .valor,
-.totais .parte {
-  text-align: right;
+.totais .valor {
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .totais .parte {
-  font-size: 0.875rem;
+  display: inline-block;
+  min-width: 3.25rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
   color: var(--tinta-suave);
+  text-align: right;
+}
+
+.totais .trilho {
+  grid-column: 1 / -1;
+  height: 10px;
 }
 
 /* ---------- Gráfico ---------- */
 
 .grafico {
   overflow-x: auto;
-  padding: 1.25rem 1.25rem 0.5rem;
-  border: 1px solid var(--linha);
-  border-radius: 14px;
-  background: var(--superficie);
 }
 
 .legenda {
@@ -584,6 +717,15 @@ select {
   fill: var(--tinta-suave);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
+}
+
+.grafico .saldo {
+  fill: var(--tinta);
+  font-weight: 600;
+}
+
+.grafico .saldo.negativo {
+  fill: var(--vencida);
 }
 
 .grafico .barra.receber {
@@ -884,41 +1026,57 @@ tbody tr + tr td {
 
 /* ---------- Telas estreitas ---------- */
 
-/* Com o menu ao lado, a conta do mês deixa de caber em uma linha antes do celular. */
-@media (max-width: 1000px) {
-  .equacao .operador {
-    display: none;
+/* Com o menu ao lado, quatro indicadores e dois cartões lado a lado apertam antes do celular. */
+@media (max-width: 1100px) {
+  .indicadores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .equacao > div {
-    width: 100%;
+  .grade-painel {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-
 @media (max-width: 760px) {
-  /* No celular cada categoria vira um bloco: nome e valor em cima, barra embaixo. */
-  .totais {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.875rem;
-    padding: 1rem;
+  /* O mês ocupa a linha inteira, com as setas nas pontas; "Nova conta" desce. */
+  .cabecalho:has(.troca-mes) {
+    flex-wrap: wrap;
   }
 
-  .totais li {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) max-content;
-    gap: 0.25rem 1rem;
+  .troca-mes {
+    width: 100%;
   }
 
-  .totais .trilho {
-    grid-column: 1 / -1;
-    order: 1;
+  .troca-mes h1 {
+    flex: 1;
+    min-width: 0;
+    font-size: 1.375rem;
   }
 
-  .totais .parte {
-    display: none;
+  .troca-mes .botao-texto {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .cabecalho:has(.troca-mes) > .botao {
+    width: 100%;
+    text-align: center;
+  }
+
+  .indicadores {
+    gap: 0.75rem;
+  }
+
+  .indicador {
+    padding: 0.875rem 0.75rem 0.875rem 1rem;
+  }
+
+  .indicador strong {
+    font-size: 1.125rem;
+  }
+
+  .cartao {
+    padding: 1.125rem 1rem 1.25rem;
   }
 
   .app {

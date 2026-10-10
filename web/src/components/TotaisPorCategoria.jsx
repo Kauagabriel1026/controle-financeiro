@@ -1,8 +1,8 @@
 import { moeda } from '../formato.js'
 
 /**
- * Barras horizontais com o total do mês em cada categoria, da maior para a
- * menor. `tipo` é "pagar" (gastos) ou "receber" (ganhos) e define a cor.
+ * Total do mês em cada categoria, da maior para a menor, com uma barra
+ * proporcional. `tipo` é "pagar" (gastos) ou "receber" (ganhos) e define a cor.
  */
 export default function TotaisPorCategoria({ totais, tipo }) {
   if (totais.categorias.length === 0) {
@@ -16,17 +16,26 @@ export default function TotaisPorCategoria({ totais, tipo }) {
   const maior = Number(totais.categorias[0].total)
 
   return (
-    <ul className="totais">
-      {totais.categorias.map((item) => (
-        <li key={item.categoria}>
-          <span>{item.categoria}</span>
-          <span className="trilho" aria-hidden="true">
-            <span className={`preenchido ${tipo}`} style={{ width: `${(Number(item.total) / maior) * 100}%` }} />
-          </span>
-          <span className="valor">{moeda(item.total)}</span>
-          <span className="parte">{item.percentual.toLocaleString('pt-BR')}%</span>
-        </li>
-      ))}
-    </ul>
+    <>
+      <p className="total-categorias">
+        <strong>{moeda(totais.total)}</strong> em {totais.categorias.length}{' '}
+        {totais.categorias.length === 1 ? 'categoria' : 'categorias'}
+      </p>
+
+      <ul className="totais">
+        {totais.categorias.map((item) => (
+          <li key={item.categoria}>
+            <span className="nome">{item.categoria}</span>
+            <span className="valor">
+              {moeda(item.total)}
+              <span className="parte">{item.percentual.toLocaleString('pt-BR')}%</span>
+            </span>
+            <span className="trilho" aria-hidden="true">
+              <span className={`preenchido ${tipo}`} style={{ width: `${(Number(item.total) / maior) * 100}%` }} />
+            </span>
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }

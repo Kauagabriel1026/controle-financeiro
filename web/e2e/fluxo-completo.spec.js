@@ -87,7 +87,7 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(page.getByRole('listitem')).toHaveCount(9)
 
   // --- Contas: criar uma vencida e uma pendente ---
-  await page.getByRole('link', { name: 'Contas' }).click()
+  await page.getByRole('link', { name: 'Contas', exact: true }).click()
   await expect(page.getByText('Nenhuma conta com esses filtros.')).toBeVisible()
 
   await criarConta(page, { tipo: 'A pagar', descricao: 'Aluguel', valor: '150010', vencimento: ontem, categoria: 'Moradia' })
@@ -137,7 +137,10 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
 
   // --- Painel: avisa da conta vencida e leva até ela ---
   await page.getByRole('link', { name: 'Painel' }).click()
-  await expect(page.getByText('Há 1 conta vencida em aberto.')).toBeVisible()
+  const vencidas = page.getByRole('group', { name: 'Contas vencidas' })
+
+  await expect(vencidas.locator('strong')).toHaveText('1')
+  await expect(page.locator('.proximas li').first()).toContainText('Pagamento do mês')
   await expect(page.getByLabel('Resumo do mês')).toContainText('R$ 5.200,00')
   await expect(page.locator('.totais li').filter({ hasText: 'Outros' })).toContainText('R$ 129,90')
   await expect(page.locator('.totais li').filter({ hasText: 'Salário' })).toContainText('R$ 5.200,00')
@@ -176,10 +179,18 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   // --- Painel reflete a edição e a baixa ---
   await page.getByRole('link', { name: 'Painel' }).click()
   await expect(page.getByLabel('Resumo do mês')).toContainText('R$ 5.300,00')
-  await expect(page.getByText('conta vencida em aberto')).toHaveCount(0)
+  await expect(vencidas.locator('strong')).toHaveText('0')
+  await expect(vencidas).toContainText('Tudo em dia')
+
+  // --- Painel: troca de mês e volta ---
+  await page.getByRole('button', { name: 'Próximo mês' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).not.toHaveText(nomeDoMes(hoje.slice(0, 7)))
+  await expect(page.getByLabel('Resumo do mês')).toContainText('R$ 129,90')
+  await page.getByRole('button', { name: 'Voltar para o mês atual' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(nomeDoMes(hoje.slice(0, 7)))
 
   // --- Exclusão ---
-  await page.getByRole('link', { name: 'Contas' }).click()
+  await page.getByRole('link', { name: 'Contas', exact: true }).click()
   await page.getByRole('button', { name: 'Ver todos os meses' }).click()
   await aluguel.getByRole('button', { name: 'Excluir' }).click()
   await expect(aluguel).toHaveCount(0)
@@ -206,7 +217,7 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await page.getByRole('button', { name: 'Sair' }).click()
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible()
   await criarUsuario(page, 'Bruno')
-  await page.getByRole('link', { name: 'Contas' }).click()
+  await page.getByRole('link', { name: 'Contas', exact: true }).click()
   await page.getByRole('button', { name: 'Ver todos os meses' }).click()
   await expect(page.getByText('Nenhuma conta com esses filtros.')).toBeVisible()
   await page.getByRole('link', { name: 'Categorias' }).click()

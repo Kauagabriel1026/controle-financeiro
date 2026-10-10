@@ -4,7 +4,7 @@
 
 Sistema de contas a pagar e a receber com fluxo de caixa por período. API em Laravel com PostgreSQL e front-end em React.
 
-![Painel com o resumo do mês e o fluxo de caixa de seis meses](docs/painel.png)
+![Painel com os indicadores do mês, o fluxo de caixa, as próximas contas e os totais por categoria](docs/painel.png)
 
 ![Lista de contas com filtros por mês, tipo e situação](docs/contas.png)
 
