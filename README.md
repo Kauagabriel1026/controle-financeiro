@@ -58,7 +58,7 @@ docker compose down
 ## Etapas
 
 - [x] Base do projeto: Laravel, PostgreSQL, Docker e testes automáticos
-- [ ] Banco de dados: categorias e contas
+- [x] Banco de dados: categorias e contas
 - [ ] API de contas a pagar e a receber, com baixa de pagamento
 - [ ] Login, com cada usuário vendo só as próprias contas
 - [ ] Fluxo de caixa por período

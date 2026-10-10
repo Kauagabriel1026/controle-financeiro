@@ -51,3 +51,10 @@ jobs:
 
       - name: Rodar testes
         run: php artisan test
+
+      - name: Rodar testes no PostgreSQL
+        run: php artisan test
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: controle_financeiro
