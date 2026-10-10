@@ -229,6 +229,11 @@ a {
   color: var(--tinta);
 }
 
+.botao-texto:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .botao-texto.forte {
   color: var(--azul-escuro);
 }
@@ -268,8 +273,10 @@ label {
   font-weight: 500;
 }
 
-input,
+input:not([type='radio']),
 select {
+  width: 100%;
+  min-width: 0;
   padding: 0.5rem 0.625rem;
   border: 1px solid #c3d0e0;
   border-radius: var(--raio);
@@ -306,6 +313,7 @@ select {
 }
 
 .carregando-tela {
+  max-width: 480px;
   padding: 3rem;
 }
 
@@ -452,6 +460,7 @@ select {
 /* ---------- Gráfico ---------- */
 
 .grafico {
+  overflow-x: auto;
   padding: 1.25rem 1.25rem 0.5rem;
   border: 1px solid var(--linha);
   border-radius: 14px;
@@ -491,6 +500,8 @@ select {
 
 .grafico-area {
   position: relative;
+  /* Abaixo disso os rótulos ficam ilegíveis; em telas pequenas o gráfico rola de lado. */
+  min-width: 520px;
 }
 
 .grafico svg {
@@ -566,6 +577,9 @@ select {
 /* ---------- Tabelas ---------- */
 
 .tabela-rolagem {
+  /* Âncora dos elementos só para leitor de tela, que são absolutos: sem ela
+     eles escapam da área de rolagem e alargam a página inteira. */
+  position: relative;
   margin-top: 1rem;
   overflow-x: auto;
   border: 1px solid var(--linha);
@@ -805,6 +819,18 @@ tbody tr + tr td {
 
 /* ---------- Telas estreitas ---------- */
 
+/* Com o menu ao lado, a conta do mês deixa de caber em uma linha antes do celular. */
+@media (max-width: 1000px) {
+  .equacao .operador {
+    display: none;
+  }
+
+  .equacao > div {
+    width: 100%;
+  }
+}
+
+
 @media (max-width: 760px) {
   .app {
     grid-template-columns: 1fr;
@@ -862,12 +888,8 @@ tbody tr + tr td {
     padding: 1.5rem 1rem 3rem;
   }
 
-  .equacao .operador {
-    display: none;
-  }
-
-  .equacao > div {
-    width: 100%;
+  .dupla {
+    grid-template-columns: 1fr;
   }
 
   .passo-mes {

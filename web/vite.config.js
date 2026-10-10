@@ -11,5 +11,7 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    // Os testes de ponta a ponta (pasta e2e) rodam com o Playwright, não com o Vitest.
+    include: ['src/**/*.test.js'],
   },
 })

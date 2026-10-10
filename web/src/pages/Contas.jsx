@@ -21,6 +21,7 @@ export default function Contas() {
   // `null` = fechado, `{}` = nova conta, objeto com dados = edição.
   const [emEdicao, setEmEdicao] = useState(parametros.get('nova') ? {} : null)
   const [erroAcao, setErroAcao] = useState('')
+  const [ocupado, setOcupado] = useState(false)
 
   const periodo = mes === 'todos' ? {} : limitesDoMes(mes)
 
@@ -47,14 +48,21 @@ export default function Contas() {
     setParametros(novos)
   }
 
+  // Enquanto uma ação está em andamento os botões ficam travados, para um
+  // clique duplo não enviar a mesma baixa ou exclusão duas vezes.
   async function executar(acao) {
+    if (ocupado) return
+
     setErroAcao('')
+    setOcupado(true)
 
     try {
       await acao()
       recarregar()
     } catch (falha) {
       setErroAcao(falha.message)
+    } finally {
+      setOcupado(false)
     }
   }
 
@@ -157,12 +165,12 @@ export default function Contas() {
                   <td>
                     <div className="acoes">
                       {conta.status === 'paga' ? (
-                        <button type="button" className="botao-texto" onClick={() => estornar(conta)}>Estornar</button>
+                        <button type="button" className="botao-texto" disabled={ocupado} onClick={() => estornar(conta)}>Estornar</button>
                       ) : (
-                        <button type="button" className="botao-texto forte" onClick={() => darBaixa(conta)}>Dar baixa</button>
+                        <button type="button" className="botao-texto forte" disabled={ocupado} onClick={() => darBaixa(conta)}>Dar baixa</button>
                       )}
                       <button type="button" className="botao-texto" onClick={() => setEmEdicao(conta)}>Editar</button>
-                      <button type="button" className="botao-texto perigo" onClick={() => excluir(conta)}>Excluir</button>
+                      <button type="button" className="botao-texto perigo" disabled={ocupado} onClick={() => excluir(conta)}>Excluir</button>
                     </div>
                   </td>
                 </tr>

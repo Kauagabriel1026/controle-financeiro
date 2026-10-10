@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { useAuth } from './auth.jsx'
+import Aviso from './components/Aviso.jsx'
 import Layout from './components/Layout.jsx'
 import Cadastro from './pages/Cadastro.jsx'
 import Categorias from './pages/Categorias.jsx'
@@ -9,10 +10,19 @@ import Login from './pages/Login.jsx'
 import Painel from './pages/Painel.jsx'
 
 export default function App() {
-  const { usuario, carregando } = useAuth()
+  const { usuario, carregando, falhaDeConexao, conferirSessao } = useAuth()
 
   if (carregando) {
     return <p className="carregando-tela">Carregando…</p>
+  }
+
+  if (falhaDeConexao) {
+    return (
+      <div className="carregando-tela">
+        <Aviso>{falhaDeConexao}</Aviso>
+        <button type="button" className="botao" onClick={conferirSessao}>Tentar de novo</button>
+      </div>
+    )
   }
 
   if (!usuario) {

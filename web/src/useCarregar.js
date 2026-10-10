@@ -14,6 +14,8 @@ export function useCarregar(buscar, chave = '') {
     // Se a tela mudar antes de a resposta chegar, a resposta antiga é ignorada.
     let ativo = true
 
+    setEstado((atual) => ({ ...atual, erro: '', carregando: true }))
+
     buscar()
       .then((dados) => ativo && setEstado({ dados, erro: '', carregando: false }))
       .catch((falha) => ativo && setEstado({ dados: null, erro: falha.message, carregando: false }))

@@ -66,6 +66,10 @@ export async function api(caminho, { metodo = 'GET', corpo, query = {} } = {}) {
   if (!resposta.ok) {
     if (resposta.status === 401 && token) aoPerderSessao?.()
 
+    if (resposta.status === 429) {
+      throw new ErroApi(429, 'Muitas tentativas em pouco tempo. Aguarde um minuto e tente de novo.')
+    }
+
     throw new ErroApi(
       resposta.status,
       dados?.message ?? 'Não foi possível concluir a operação.',

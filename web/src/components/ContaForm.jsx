@@ -33,7 +33,8 @@ export default function ContaForm({ conta, categorias, aoSalvar, aoFechar }) {
     setErros({})
     setEnviando(true)
 
-    const corpo = { ...form, categoria_id: form.categoria_id || null }
+    // O <select> devolve texto; a API espera o número da categoria ou nulo.
+    const corpo = { ...form, categoria_id: form.categoria_id ? Number(form.categoria_id) : null }
 
     try {
       if (conta) {
