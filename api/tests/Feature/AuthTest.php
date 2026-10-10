@@ -70,6 +70,7 @@ class AuthTest extends TestCase
         $this->getJson('/api/eu')->assertUnauthorized();
         $this->getJson('/api/contas')->assertUnauthorized();
         $this->getJson('/api/categorias')->assertUnauthorized();
+        $this->getJson('/api/fluxo-caixa')->assertUnauthorized();
     }
 
     public function test_eu_devolve_o_usuario_logado(): void

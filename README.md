@@ -68,6 +68,14 @@ Filtros de `GET /contas`: `tipo` (`pagar` ou `receber`), `status` (`pendente`, `
 
 Cada usuário só enxerga as próprias contas e categorias. O status é calculado: `paga` quando há data de pagamento, `vencida` quando o vencimento já passou e `pendente` nos demais casos.
 
+### Fluxo de caixa 🔒
+
+| Método | Rota | O que faz |
+| --- | --- | --- |
+| GET | `/fluxo-caixa` | Totais por mês de vencimento, com saldo e saldo acumulado |
+
+Parâmetros opcionais: `de` e `ate`, no formato `AAAA-MM-DD`. Sem eles, o período é o mês atual mais os cinco seguintes. Para cada mês a resposta traz o previsto (`receber`, `pagar`, `saldo`, `saldo_acumulado`) e o realizado (`recebido`, `pago`).
+
 Exemplo de criação de conta:
 
 ```bash
@@ -110,5 +118,5 @@ docker compose down
 - [x] Banco de dados: categorias e contas
 - [x] API de contas a pagar e a receber, com baixa de pagamento
 - [x] Login, com cada usuário vendo só as próprias contas
-- [ ] Fluxo de caixa por período
+- [x] Fluxo de caixa por período
 - [ ] Front-end em React

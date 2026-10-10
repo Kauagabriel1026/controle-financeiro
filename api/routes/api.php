@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\ContaController;
+use App\Http\Controllers\Api\FluxoCaixaController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -34,4 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/contas/{id}', [ContaController::class, 'destroy'])->whereNumber('id');
     Route::post('/contas/{id}/pagar', [ContaController::class, 'pagar'])->whereNumber('id');
     Route::post('/contas/{id}/estornar', [ContaController::class, 'estornar'])->whereNumber('id');
+
+    Route::get('/fluxo-caixa', FluxoCaixaController::class);
 });
