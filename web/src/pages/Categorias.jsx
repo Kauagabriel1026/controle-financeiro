@@ -10,9 +10,11 @@ export default function Categorias() {
   // Categoria que está sendo renomeada: { id, nome }.
   const [edicao, setEdicao] = useState(null)
   const [erroAcao, setErroAcao] = useState('')
+  const [nota, setNota] = useState('')
 
   async function executar(acao) {
     setErroAcao('')
+    setNota('')
 
     try {
       await acao()
@@ -42,6 +44,19 @@ export default function Categorias() {
     }
   }
 
+  async function adicionarSugeridas() {
+    const antes = dados.data.length
+    let depois = antes
+
+    const deuCerto = await executar(async () => {
+      depois = (await api('/categorias/sugeridas', { metodo: 'POST' })).data.length
+    })
+
+    if (deuCerto && depois === antes) {
+      setNota('Você já tem todas as categorias sugeridas.')
+    }
+  }
+
   function excluir(categoria) {
     const pergunta = `Excluir a categoria "${categoria.nome}"? As contas dela continuam existindo, só ficam sem categoria.`
 
@@ -54,6 +69,11 @@ export default function Categorias() {
     <>
       <header className="cabecalho">
         <h1>Categorias</h1>
+        {dados && (
+          <button type="button" className="botao secundario" onClick={adicionarSugeridas}>
+            Adicionar categorias sugeridas
+          </button>
+        )}
       </header>
 
       <form className="nova-categoria" onSubmit={criar}>
@@ -65,11 +85,12 @@ export default function Categorias() {
       </form>
 
       <Aviso>{erro || erroAcao}</Aviso>
+      {nota && <p className="nota" role="status">{nota}</p>}
 
       {carregando && !dados && <p className="carregando">Carregando…</p>}
 
       {dados && dados.data.length === 0 && (
-        <p className="vazio">Nenhuma categoria ainda. Crie a primeira no campo acima para organizar suas contas.</p>
+        <p className="vazio">Nenhuma categoria ainda. Crie a primeira no campo acima ou adicione as sugeridas.</p>
       )}
 
       {dados && dados.data.length > 0 && (

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  dataBR, hojeISO, limitesDoMes, mesCurto, mesDe, moeda, moedaCurta, nomeDoMes, somarMeses,
+  centavosParaTexto, centavosParaValor, dataBR, hojeISO, limitesDoMes, mesCurto, mesDe, moeda, moedaCurta, nomeDoMes, somarMeses, valorParaCentavos,
 } from './formato.js'
 
 // O Intl separa "R$" do número com um espaço não separável.
@@ -37,5 +37,15 @@ describe('formato', () => {
     expect(limitesDoMes('2026-02')).toEqual({ de: '2026-02-01', ate: '2026-02-28' })
     expect(limitesDoMes('2028-02')).toEqual({ de: '2028-02-01', ate: '2028-02-29' })
     expect(limitesDoMes('2026-12')).toEqual({ de: '2026-12-01', ate: '2026-12-31' })
+  })
+
+  it('converte o valor entre centavos, texto do campo e formato da API', () => {
+    expect(centavosParaTexto(160000)).toBe('1.600,00')
+    expect(centavosParaTexto(5)).toBe('0,05')
+    expect(valorParaCentavos('1500.10')).toBe(150010)
+    expect(valorParaCentavos('129.90')).toBe(12990)
+    expect(valorParaCentavos('0.07')).toBe(7)
+    expect(centavosParaValor(150010)).toBe('1500.10')
+    expect(centavosParaValor(160)).toBe('1.60')
   })
 })

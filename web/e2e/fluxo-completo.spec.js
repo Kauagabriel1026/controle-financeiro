@@ -59,29 +59,36 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   const email = await criarUsuario(page, 'Ana')
   await expect(page.getByText('Nenhuma conta com vencimento neste período.')).toBeVisible()
 
-  // --- Categorias: criar, recusar nome repetido, renomear ---
+  // --- Categorias: sugeridas de início, criar, recusar nome repetido, renomear ---
+  const adicionar = page.getByRole('button', { name: 'Adicionar categoria', exact: true })
+
   await page.getByRole('link', { name: 'Categorias' }).click()
-  await page.getByLabel('Nova categoria').fill('Moradia')
-  await page.getByRole('button', { name: 'Adicionar categoria' }).click()
+  await expect(page.getByRole('listitem')).toHaveCount(8)
   await expect(page.getByRole('listitem').filter({ hasText: 'Moradia' })).toBeVisible()
 
   await page.getByLabel('Nova categoria').fill('Moradia')
-  await page.getByRole('button', { name: 'Adicionar categoria' }).click()
+  await adicionar.click()
   await expect(page.getByRole('alert')).toHaveText('Já existe um cadastro com esse nome.')
 
-  await page.getByLabel('Nova categoria').fill('Renda')
-  await page.getByRole('button', { name: 'Adicionar categoria' }).click()
-  await page.getByRole('listitem').filter({ hasText: 'Renda' }).getByRole('button', { name: 'Renomear' }).click()
-  await page.getByLabel('Novo nome').fill('Salário')
+  await page.getByLabel('Nova categoria').fill('Investimento')
+  await adicionar.click()
+  await page.getByRole('listitem').filter({ hasText: 'Investimento' }).getByRole('button', { name: 'Renomear' }).click()
+  await page.getByLabel('Novo nome').fill('Reserva')
   await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(page.getByRole('listitem').filter({ hasText: 'Salário' })).toBeVisible()
+  await expect(page.getByRole('listitem').filter({ hasText: 'Reserva' })).toBeVisible()
+  await expect(page.getByRole('listitem')).toHaveCount(9)
+
+  // Pedir as sugeridas de novo não duplica nada.
+  await page.getByRole('button', { name: 'Adicionar categorias sugeridas' }).click()
+  await expect(page.getByRole('status')).toHaveText('Você já tem todas as categorias sugeridas.')
+  await expect(page.getByRole('listitem')).toHaveCount(9)
 
   // --- Contas: criar uma vencida e uma pendente ---
   await page.getByRole('link', { name: 'Contas' }).click()
   await expect(page.getByText('Nenhuma conta com esses filtros.')).toBeVisible()
 
-  await criarConta(page, { tipo: 'A pagar', descricao: 'Aluguel', valor: '1500.10', vencimento: ontem, categoria: 'Moradia' })
-  await criarConta(page, { tipo: 'A receber', descricao: 'Pagamento do mês', valor: '5200', vencimento: hoje, categoria: 'Salário' })
+  await criarConta(page, { tipo: 'A pagar', descricao: 'Aluguel', valor: '150010', vencimento: ontem, categoria: 'Moradia' })
+  await criarConta(page, { tipo: 'A receber', descricao: 'Pagamento do mês', valor: '520000', vencimento: hoje, categoria: 'Salário' })
 
   await page.getByRole('button', { name: 'Ver todos os meses' }).click()
 
@@ -94,12 +101,19 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(aluguel).toContainText('Vencida')
   await expect(pagamento).toContainText('Pendente')
 
-  // --- Validação: valor zero é recusado antes de sair do formulário ---
+  // --- Campo de valor: os centavos entram pela direita, como em app de banco ---
   await page.getByRole('button', { name: 'Nova conta' }).click()
+  const campoValor = page.getByRole('dialog').getByLabel('Valor (R$)')
+  await campoValor.pressSequentially('160000')
+  await expect(campoValor).toHaveValue('1.600,00')
+  await campoValor.press('Backspace')
+  await expect(campoValor).toHaveValue('160,00')
+
+  // --- Validação: valor zero é recusado antes de sair do formulário ---
   await page.getByRole('dialog').getByLabel('Descrição').fill('Conta inválida')
-  await page.getByRole('dialog').getByLabel('Valor (R$)').fill('0')
+  await campoValor.fill('0')
   await page.getByRole('dialog').getByRole('button', { name: 'Salvar conta' }).click()
-  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('dialog')).toContainText('Informe um valor maior que zero.')
   await page.getByRole('dialog').getByRole('button', { name: 'Cancelar' }).click()
   await expect(page.getByRole('row').filter({ hasText: 'Conta inválida' })).toHaveCount(0)
 
@@ -129,7 +143,7 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
 
   // --- Edição ---
   await pagamento.getByRole('button', { name: 'Editar' }).click()
-  await page.getByRole('dialog').getByLabel('Valor (R$)').fill('5300')
+  await page.getByRole('dialog').getByLabel('Valor (R$)').fill('530000')
   await page.getByRole('dialog').getByRole('button', { name: 'Salvar conta' }).click()
   await expect(pagamento).toContainText('R$ 5.300,00')
 
@@ -176,7 +190,8 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await page.getByRole('button', { name: 'Ver todos os meses' }).click()
   await expect(page.getByText('Nenhuma conta com esses filtros.')).toBeVisible()
   await page.getByRole('link', { name: 'Categorias' }).click()
-  await expect(page.getByText('Nenhuma categoria ainda.')).toBeVisible()
+  await expect(page.getByRole('listitem')).toHaveCount(8)
+  await expect(page.getByRole('listitem').filter({ hasText: 'Reserva' })).toHaveCount(0)
 
   expect(erros).toEqual([])
 })

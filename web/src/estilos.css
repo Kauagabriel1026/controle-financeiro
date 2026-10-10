@@ -306,6 +306,11 @@ select {
   color: #8c1d18;
 }
 
+.nota {
+  margin-bottom: 1rem;
+  color: var(--tinta-suave);
+}
+
 .carregando,
 .carregando-tela,
 .vazio {

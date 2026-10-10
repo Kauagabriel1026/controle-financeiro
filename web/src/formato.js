@@ -69,3 +69,18 @@ export function somarMeses(anoMes, quantidade) {
 
   return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`
 }
+
+/** 160000 -> "1.600,00" — texto mostrado no campo de valor. */
+export function centavosParaTexto(centavos) {
+  return (centavos / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+/** "1500.10" (como a API devolve) -> 150010 */
+export function valorParaCentavos(valor) {
+  return Math.round(Number(valor) * 100)
+}
+
+/** 150010 -> "1500.10" (como a API espera) */
+export function centavosParaValor(centavos) {
+  return (centavos / 100).toFixed(2)
+}

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { api } from '../api.js'
-import { hojeISO } from '../formato.js'
+import { centavosParaValor, hojeISO, valorParaCentavos } from '../formato.js'
 import Aviso from './Aviso.jsx'
+import CampoValor from './CampoValor.jsx'
 
 /**
  * Janela de criar ou editar conta. Recebe `conta` para editar; sem ela, cria.
@@ -13,7 +14,7 @@ export default function ContaForm({ conta, categorias, aoSalvar, aoFechar }) {
   const [form, setForm] = useState({
     tipo: conta?.tipo ?? 'pagar',
     descricao: conta?.descricao ?? '',
-    valor: conta?.valor ?? '',
+    centavos: conta ? valorParaCentavos(conta.valor) : 0,
     vencimento: conta?.vencimento ?? hojeISO(),
     categoria_id: conta?.categoria?.id ?? '',
   })
@@ -31,10 +32,23 @@ export default function ContaForm({ conta, categorias, aoSalvar, aoFechar }) {
     evento.preventDefault()
     setErro('')
     setErros({})
+
+    if (form.centavos <= 0) {
+      setErros({ valor: ['Informe um valor maior que zero.'] })
+
+      return
+    }
+
     setEnviando(true)
 
-    // O <select> devolve texto; a API espera o número da categoria ou nulo.
-    const corpo = { ...form, categoria_id: form.categoria_id ? Number(form.categoria_id) : null }
+    const corpo = {
+      tipo: form.tipo,
+      descricao: form.descricao,
+      valor: centavosParaValor(form.centavos),
+      vencimento: form.vencimento,
+      // O <select> devolve texto; a API espera o número da categoria ou nulo.
+      categoria_id: form.categoria_id ? Number(form.categoria_id) : null,
+    }
 
     try {
       if (conta) {
@@ -79,7 +93,8 @@ export default function ContaForm({ conta, categorias, aoSalvar, aoFechar }) {
         <div className="dupla">
           <label>
             Valor (R$)
-            <input type="number" value={form.valor} onChange={mudar('valor')} min="0.01" step="0.01" required />
+            <CampoValor centavos={form.centavos} aoMudar={(centavos) => setForm({ ...form, centavos })} />
+            <span className="dica">Digite só os números: 160000 vira 1.600,00.</span>
             {erros.valor && <span className="erro-campo">{erros.valor[0]}</span>}
           </label>
 
