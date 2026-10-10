@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\CategoriasSugeridas;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,6 +22,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($dados);
+        CategoriasSugeridas::adicionarPara($user);
 
         return $this->respostaComToken($user, 201);
     }

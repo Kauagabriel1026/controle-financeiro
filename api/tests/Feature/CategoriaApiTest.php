@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Categoria;
 use App\Models\User;
+use App\Support\CategoriasSugeridas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -91,5 +92,21 @@ class CategoriaApiTest extends TestCase
         $this->deleteJson("/api/categorias/{$alheia->id}")->assertNotFound();
 
         $this->assertDatabaseHas('categorias', ['id' => $alheia->id, 'nome' => 'Alheia']);
+    }
+
+    public function test_adiciona_as_sugeridas_que_faltam_sem_duplicar(): void
+    {
+        Categoria::factory()->for($this->user)->create(['nome' => 'Moradia']);
+        Categoria::factory()->for($this->user)->create(['nome' => 'Minha categoria']);
+
+        $this->postJson('/api/categorias/sugeridas')
+            ->assertOk()
+            ->assertJsonCount(count(CategoriasSugeridas::NOMES) + 1, 'data');
+
+        // Chamar de novo não cria nada.
+        $this->postJson('/api/categorias/sugeridas')
+            ->assertJsonCount(count(CategoriasSugeridas::NOMES) + 1, 'data');
+
+        $this->assertDatabaseCount('categorias', count(CategoriasSugeridas::NOMES) + 1);
     }
 }

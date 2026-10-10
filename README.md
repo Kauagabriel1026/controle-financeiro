@@ -50,7 +50,7 @@ Todas as rotas ficam em `http://localhost:8000/api`. As rotas marcadas com 🔒 
 
 | Método | Rota | O que faz |
 | --- | --- | --- |
-| POST | `/registrar` | Cria o usuário e devolve um token |
+| POST | `/registrar` | Cria o usuário, com as categorias sugeridas, e devolve um token |
 | POST | `/login` | Devolve um token |
 | GET | `/eu` 🔒 | Dados do usuário logado |
 | POST | `/logout` 🔒 | Invalida o token usado |
@@ -61,6 +61,7 @@ Todas as rotas ficam em `http://localhost:8000/api`. As rotas marcadas com 🔒 
 | --- | --- | --- |
 | GET | `/categorias` | Lista as categorias do usuário |
 | POST | `/categorias` | Cria uma categoria |
+| POST | `/categorias/sugeridas` | Adiciona as categorias sugeridas que faltam |
 | PUT | `/categorias/{id}` | Renomeia uma categoria |
 | DELETE | `/categorias/{id}` | Exclui uma categoria |
 

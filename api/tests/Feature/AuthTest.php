@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\CategoriasSugeridas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -25,6 +26,23 @@ class AuthTest extends TestCase
             ->assertJsonStructure(['usuario' => ['id', 'name', 'email'], 'token']);
 
         $this->assertDatabaseHas('users', ['email' => 'maria@example.com']);
+    }
+
+    public function test_usuario_novo_ja_comeca_com_as_categorias_sugeridas(): void
+    {
+        $this->postJson('/api/registrar', [
+            'name' => 'Maria Teste',
+            'email' => 'maria@example.com',
+            'password' => 'senha-segura',
+            'password_confirmation' => 'senha-segura',
+        ])->assertCreated();
+
+        $user = User::where('email', 'maria@example.com')->firstOrFail();
+
+        $this->assertEqualsCanonicalizing(
+            CategoriasSugeridas::NOMES,
+            $user->categorias()->pluck('nome')->all(),
+        );
     }
 
     public function test_registrar_recusa_email_ja_cadastrado(): void

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SalvarCategoriaRequest;
 use App\Http\Resources\CategoriaResource;
+use App\Support\CategoriasSugeridas;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -23,6 +24,16 @@ class CategoriaController extends Controller
         $categoria = $request->user()->categorias()->create($request->validated());
 
         return new CategoriaResource($categoria);
+    }
+
+    /**
+     * Adiciona as categorias sugeridas que faltam e devolve a lista completa.
+     */
+    public function sugeridas(Request $request): AnonymousResourceCollection
+    {
+        CategoriasSugeridas::adicionarPara($request->user());
+
+        return $this->index($request);
     }
 
     public function update(SalvarCategoriaRequest $request, int $id): CategoriaResource
