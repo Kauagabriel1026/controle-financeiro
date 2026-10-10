@@ -6,19 +6,20 @@ use App\Enums\TipoConta;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 
-class GastosPorCategoria
+class TotaisPorCategoria
 {
     /**
-     * Soma as contas a pagar do período por categoria, da maior para a menor.
+     * Soma as contas de um tipo (a pagar ou a receber) por categoria, da maior
+     * para a menor, dentro do período.
      * Como no fluxo de caixa, a soma é feita em centavos.
      *
      * @return array{total: string, categorias: list<array{categoria: string, total: string, percentual: float}>}
      */
-    public function calcular(User $user, CarbonImmutable $de, CarbonImmutable $ate): array
+    public function calcular(User $user, TipoConta $tipo, CarbonImmutable $de, CarbonImmutable $ate): array
     {
         $contas = $user->contas()
             ->with('categoria')
-            ->where('tipo', TipoConta::Pagar)
+            ->where('tipo', $tipo)
             ->whereDate('vencimento', '>=', $de->toDateString())
             ->whereDate('vencimento', '<=', $ate->toDateString())
             ->get();

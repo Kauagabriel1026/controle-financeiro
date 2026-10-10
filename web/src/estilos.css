@@ -467,9 +467,16 @@ select {
   background: var(--superficie);
 }
 
-/* ---------- Gastos por categoria ---------- */
+/* ---------- Gastos e ganhos por categoria ---------- */
 
-.gastos {
+.lado-a-lado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 0 1.5rem;
+  align-items: start;
+}
+
+.totais {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
   align-items: center;
@@ -482,17 +489,17 @@ select {
   list-style: none;
 }
 
-.gastos li {
+.totais li {
   display: contents;
 }
 
-.gastos .trilho {
+.totais .trilho {
   height: 12px;
   border-radius: 4px;
   background: var(--papel);
 }
 
-.gastos .preenchido {
+.totais .preenchido {
   display: block;
   height: 100%;
   min-width: 2px;
@@ -500,13 +507,17 @@ select {
   background: var(--pagar);
 }
 
-.gastos .valor,
-.gastos .parte {
+.totais .preenchido.receber {
+  background: var(--receber);
+}
+
+.totais .valor,
+.totais .parte {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-.gastos .parte {
+.totais .parte {
   font-size: 0.875rem;
   color: var(--tinta-suave);
 }
@@ -886,17 +897,27 @@ tbody tr + tr td {
 
 
 @media (max-width: 760px) {
-  .gastos {
-    grid-template-columns: minmax(0, 1fr) max-content;
+  /* No celular cada categoria vira um bloco: nome e valor em cima, barra embaixo. */
+  .totais {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.875rem;
     padding: 1rem;
   }
 
-  .gastos .trilho {
+  .totais li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 0.25rem 1rem;
+  }
+
+  .totais .trilho {
     grid-column: 1 / -1;
     order: 1;
   }
 
-  .gastos .parte {
+  .totais .parte {
     display: none;
   }
 

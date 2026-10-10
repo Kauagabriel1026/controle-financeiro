@@ -70,7 +70,8 @@ Todas as rotas ficam em `http://localhost:8000/api`. As rotas marcadas com 🔒 
 | Método | Rota | O que faz |
 | --- | --- | --- |
 | GET | `/contas` | Lista as contas, com paginação e filtros |
-| POST | `/contas` | Cria uma conta a pagar ou a receber |
+| GET | `/contas/exportar` | Baixa as contas dos mesmos filtros em CSV |
+| POST | `/contas` | Cria uma conta a pagar ou a receber; com `repetir_meses`, repete nos meses seguintes |
 | GET | `/contas/{id}` | Mostra uma conta |
 | PUT | `/contas/{id}` | Edita uma conta |
 | DELETE | `/contas/{id}` | Exclui uma conta |
@@ -81,13 +82,14 @@ Filtros de `GET /contas`: `tipo` (`pagar` ou `receber`), `status` (`pendente`, `
 
 Cada usuário só enxerga as próprias contas e categorias. O status é calculado: `paga` quando há data de pagamento, `vencida` quando o vencimento já passou e `pendente` nos demais casos.
 
-### Fluxo de caixa 🔒
+### Painel 🔒
 
 | Método | Rota | O que faz |
 | --- | --- | --- |
 | GET | `/fluxo-caixa` | Totais por mês de vencimento, com saldo e saldo acumulado |
+| GET | `/totais-por-categoria` | Gastos e ganhos do período por categoria |
 
-Parâmetros opcionais: `de` e `ate`, no formato `AAAA-MM-DD`. Sem eles, o período é o mês atual mais os cinco seguintes. Para cada mês a resposta traz o previsto (`receber`, `pagar`, `saldo`, `saldo_acumulado`) e o realizado (`recebido`, `pago`).
+Parâmetros opcionais nas duas: `de` e `ate`, no formato `AAAA-MM-DD`. Sem eles, o fluxo de caixa cobre o mês atual mais os cinco seguintes, e os totais por categoria cobrem o mês atual. Para cada mês a resposta traz o previsto (`receber`, `pagar`, `saldo`, `saldo_acumulado`) e o realizado (`recebido`, `pago`).
 
 Exemplo de criação de conta:
 
@@ -130,7 +132,7 @@ docker compose down
 ├── web/                  # Front-end em React
 │   └── src/
 │       ├── pages/        # Telas: login, painel, contas e categorias
-│       ├── components/   # Layout, formulário de conta e gráfico
+│       ├── components/   # Layout, formulário de conta e gráficos
 │       ├── api.js        # Chamadas à API, com o token do usuário
 │       └── auth.jsx      # Sessão do usuário logado
 ├── docker-compose.yml    # Sobe a API, o PostgreSQL e o front-end
@@ -145,3 +147,4 @@ docker compose down
 - [x] Login, com cada usuário vendo só as próprias contas
 - [x] Fluxo de caixa por período
 - [x] Front-end em React
+- [x] Contas recorrentes, exportação em CSV e gastos e ganhos por categoria

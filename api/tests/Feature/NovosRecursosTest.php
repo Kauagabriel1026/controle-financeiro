@@ -134,9 +134,9 @@ class NovosRecursosTest extends TestCase
         $this->assertStringContainsString("\"'=HYPERLINK", $csv);
     }
 
-    // ---------- Gastos por categoria ----------
+    // ---------- Totais por categoria ----------
 
-    public function test_soma_os_gastos_do_periodo_por_categoria_do_maior_para_o_menor(): void
+    public function test_soma_gastos_e_ganhos_do_periodo_por_categoria_do_maior_para_o_menor(): void
     {
         $moradia = Categoria::factory()->for($this->user)->create(['nome' => 'Moradia']);
         $lazer = Categoria::factory()->for($this->user)->create(['nome' => 'Lazer']);
@@ -147,33 +147,41 @@ class NovosRecursosTest extends TestCase
         $conta(['valor' => 99.90, 'categoria_id' => $moradia->id]);
         $conta(['valor' => 300, 'categoria_id' => $lazer->id]);
         $conta(['valor' => 100]);
-        $conta(['valor' => 9999, 'tipo' => 'receber', 'categoria_id' => $lazer->id]);
+        $conta(['valor' => 5000, 'tipo' => 'receber', 'categoria_id' => $lazer->id]);
         $conta(['valor' => 9999, 'vencimento' => '2026-11-10']);
         Conta::factory()->create(['tipo' => 'pagar', 'valor' => 9999, 'vencimento' => '2026-10-10']);
 
-        $this->getJson('/api/gastos-por-categoria?de=2026-10-01&ate=2026-10-31')
+        $this->getJson('/api/totais-por-categoria?de=2026-10-01&ate=2026-10-31')
             ->assertOk()
             ->assertExactJson([
                 'periodo' => ['de' => '2026-10-01', 'ate' => '2026-10-31'],
-                'total' => '2000.00',
-                'categorias' => [
-                    ['categoria' => 'Moradia', 'total' => '1600.00', 'percentual' => 80],
-                    ['categoria' => 'Lazer', 'total' => '300.00', 'percentual' => 15],
-                    ['categoria' => 'Sem categoria', 'total' => '100.00', 'percentual' => 5],
+                'gastos' => [
+                    'total' => '2000.00',
+                    'categorias' => [
+                        ['categoria' => 'Moradia', 'total' => '1600.00', 'percentual' => 80],
+                        ['categoria' => 'Lazer', 'total' => '300.00', 'percentual' => 15],
+                        ['categoria' => 'Sem categoria', 'total' => '100.00', 'percentual' => 5],
+                    ],
+                ],
+                'ganhos' => [
+                    'total' => '5000.00',
+                    'categorias' => [
+                        ['categoria' => 'Lazer', 'total' => '5000.00', 'percentual' => 100],
+                    ],
                 ],
             ]);
     }
 
-    public function test_gastos_por_categoria_sem_contas_devolve_lista_vazia(): void
+    public function test_totais_por_categoria_sem_contas_devolve_listas_vazias(): void
     {
         $this->travelTo('2026-10-10');
 
-        $this->getJson('/api/gastos-por-categoria')
+        $this->getJson('/api/totais-por-categoria')
             ->assertOk()
             ->assertExactJson([
                 'periodo' => ['de' => '2026-10-01', 'ate' => '2026-10-31'],
-                'total' => '0.00',
-                'categorias' => [],
+                'gastos' => ['total' => '0.00', 'categorias' => []],
+                'ganhos' => ['total' => '0.00', 'categorias' => []],
             ]);
     }
 }

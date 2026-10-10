@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\TipoConta;
 use App\Http\Controllers\Controller;
-use App\Services\GastosPorCategoria;
+use App\Services\TotaisPorCategoria;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class GastosPorCategoriaController extends Controller
+class TotaisPorCategoriaController extends Controller
 {
     /**
+     * Gastos (contas a pagar) e ganhos (contas a receber) por categoria.
      * Sem datas informadas, o período é o mês atual.
      */
-    public function __invoke(Request $request, GastosPorCategoria $gastos): JsonResponse
+    public function __invoke(Request $request, TotaisPorCategoria $totais): JsonResponse
     {
         $dados = $request->validate([
             'de' => ['nullable', 'date'],
@@ -32,7 +34,8 @@ class GastosPorCategoriaController extends Controller
 
         return response()->json([
             'periodo' => ['de' => $de->toDateString(), 'ate' => $ate->toDateString()],
-            ...$gastos->calcular($request->user(), $de, $ate),
+            'gastos' => $totais->calcular($request->user(), TipoConta::Pagar, $de, $ate),
+            'ganhos' => $totais->calcular($request->user(), TipoConta::Receber, $de, $ate),
         ]);
     }
 }

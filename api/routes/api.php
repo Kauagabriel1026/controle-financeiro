@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\ContaController;
 use App\Http\Controllers\Api\FluxoCaixaController;
-use App\Http\Controllers\Api\GastosPorCategoriaController;
+use App\Http\Controllers\Api\TotaisPorCategoriaController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -43,5 +43,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/contas/{id}/estornar', [ContaController::class, 'estornar'])->whereNumber('id');
 
     Route::get('/fluxo-caixa', FluxoCaixaController::class);
-    Route::get('/gastos-por-categoria', GastosPorCategoriaController::class);
+    Route::get('/totais-por-categoria', TotaisPorCategoriaController::class);
 });
