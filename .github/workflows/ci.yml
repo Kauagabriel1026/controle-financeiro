@@ -154,3 +154,41 @@ jobs:
           registro="${registro//'%'/'%25'}"
           registro="${registro//$'\n'/'%0A'}"
           echo "::error title=Log da API::$registro"
+
+  # Confere que o ambiente do README (docker compose up) sobe de verdade.
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Subir com Docker Compose
+        run: docker compose up -d --build
+
+      - name: Esperar a API e o front-end responderem
+        run: |
+          curl --silent --fail --retry 90 --retry-delay 2 --retry-all-errors http://localhost:8000/api/health
+          curl --silent --fail --retry 60 --retry-delay 2 --retry-all-errors --output /dev/null http://localhost:5173
+
+      - name: Rodar os testes dentro dos contêineres
+        run: |
+          docker compose exec -T api php artisan test
+          docker compose exec -T web npm test
+
+      - name: Medir o tempo de resposta da API
+        run: |
+          tempos=""
+          for i in $(seq 1 15); do
+            tempos="$tempos $(curl --silent --output /dev/null --write-out '%{time_total}' http://localhost:8000/api/health)"
+          done
+          echo "::notice title=Tempo de resposta da API no Docker (15 chamadas, em segundos)::$tempos"
+          opcache=$(docker compose exec -T api php -r 'echo function_exists("opcache_get_status") ? "ativo" : "inativo";')
+          echo "::notice title=OPcache::$opcache"
+
+      - name: Mostrar os logs se algo falhar
+        if: failure()
+        run: |
+          registro=$(docker compose logs --no-color --tail 40 api web | tail -c 3500)
+          registro="${registro//'%'/'%25'}"
+          registro="${registro//$'\n'/'%0A'}"
+          echo "::error title=Logs do Docker Compose::$registro"

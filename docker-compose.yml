@@ -21,6 +21,9 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/var/www/api
+      # As dependências ficam em um volume do Docker. Lidas direto da pasta do
+      # Windows, cada requisição levava de 0,2 a 2 segundos.
+      - api_vendor:/var/www/api/vendor
     depends_on:
       db:
         condition: service_healthy
@@ -40,4 +43,5 @@ services:
 
 volumes:
   dados_postgres:
+  api_vendor:
   web_node_modules:

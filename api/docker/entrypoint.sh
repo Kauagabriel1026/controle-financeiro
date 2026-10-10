@@ -8,7 +8,7 @@ fi
 
 # Instala as dependências na primeira vez e sempre que o composer.json mudar.
 HASH=$(md5sum composer.json | cut -d' ' -f1)
-if [ ! -d vendor ]; then
+if [ ! -f vendor/autoload.php ]; then
     composer install --no-interaction --prefer-dist
 elif [ "$(cat vendor/.composer-hash 2>/dev/null)" != "$HASH" ]; then
     composer update --no-interaction --prefer-dist
