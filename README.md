@@ -24,8 +24,8 @@ As imagens mostram o sistema com dados de exemplo.
 Pré-requisitos: [Docker Desktop](https://www.docker.com/products/docker-desktop/) e Git.
 
 ```bash
-git clone https://github.com/Kauagabriel1026/controle-financeiro.git
-cd controle-financeiro
+git clone https://github.com/Kauagabriel1026/kamel-controle-financeiro.git
+cd kamel-controle-financeiro
 docker compose up --build
 ```
 
