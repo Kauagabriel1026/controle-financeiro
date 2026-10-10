@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: controle_financeiro
+          POSTGRES_USER: financeiro
+          POSTGRES_PASSWORD: financeiro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U financeiro -d controle_financeiro"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo_pgsql
+          coverage: none
+
+      - name: Instalar dependências
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Preparar ambiente
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Aplicar migrations no PostgreSQL
+        run: php artisan migrate --force
+        env:
+          DB_HOST: 127.0.0.1
+
+      - name: Rodar testes
+        run: php artisan test
