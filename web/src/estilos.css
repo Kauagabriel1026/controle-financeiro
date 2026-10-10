@@ -7,6 +7,7 @@
   --azul: #1a73e8;
   --azul-escuro: #1560c4;
   --azul-claro: #e8f1fd;
+  --marinho: #12395b;
   --receber: #1a73e8;
   --pagar: #e8710a;
   --vencida: #c5221f;
@@ -80,35 +81,45 @@ a {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0 0.5rem;
-  color: var(--tinta);
+  padding: 0 0.25rem;
+  color: var(--marinho);
   line-height: 1.15;
 }
 
 .marca-simbolo {
-  display: grid;
-  place-items: center;
   flex: none;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 10px;
-  background: var(--azul);
-  color: #fff;
-  font-size: 1.25rem;
-  font-weight: 700;
+  width: 3rem;
+  height: 3rem;
 }
 
+/* O nome segue a logo: caixa alta, peso forte e letras espaçadas. */
 .marca-nome {
   display: block;
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .marca-sub {
   display: block;
-  font-size: 0.8125rem;
-  color: var(--tinta-suave);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.marca.grande .marca-simbolo {
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+.marca.grande .marca-nome {
+  font-size: 2.5rem;
+}
+
+.marca.grande .marca-sub {
+  font-size: 0.9375rem;
 }
 
 .lateral nav {
@@ -325,22 +336,12 @@ select {
   justify-content: space-between;
   gap: 2rem;
   padding: 3rem;
-  background: var(--azul);
-  color: #fff;
+  background: var(--azul-claro);
+  color: var(--marinho);
 }
 
 .entrada-marca .marca {
   padding: 0;
-  color: #fff;
-}
-
-.entrada-marca .marca-simbolo {
-  background: #fff;
-  color: var(--azul);
-}
-
-.entrada-marca .marca-sub {
-  color: #d6e6fc;
 }
 
 .entrada-marca h2 {
@@ -358,7 +359,7 @@ select {
   margin: 0;
   padding: 0;
   list-style: none;
-  color: #e3eefd;
+  color: #3c5876;
 }
 
 .entrada-lado {
@@ -830,6 +831,19 @@ tbody tr + tr td {
   .entrada-marca h2,
   .entrada-marca ul {
     display: none;
+  }
+
+  .marca.grande .marca-simbolo {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .marca.grande .marca-nome {
+    font-size: 1.625rem;
+  }
+
+  .marca.grande .marca-sub {
+    font-size: 0.6875rem;
   }
 
   .lateral nav {

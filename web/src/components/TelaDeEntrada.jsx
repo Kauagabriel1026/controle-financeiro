@@ -5,7 +5,7 @@ export default function TelaDeEntrada({ children }) {
   return (
     <div className="entrada">
       <div className="entrada-marca">
-        <Marca />
+        <Marca grande />
         <h2>Saiba hoje como fecha o seu mês.</h2>
         <ul>
           <li>Contas a pagar e a receber em um só lugar</li>
