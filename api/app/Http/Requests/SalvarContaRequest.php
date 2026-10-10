@@ -25,6 +25,7 @@ class SalvarContaRequest extends FormRequest
             'descricao' => ['required', 'string', 'max:120'],
             'valor' => ['required', 'numeric', 'gt:0', 'max:9999999999.99'],
             'vencimento' => ['required', 'date'],
+            'repetir_meses' => ['nullable', 'integer', 'min:1', 'max:24'],
             'categoria_id' => [
                 'nullable',
                 'integer',

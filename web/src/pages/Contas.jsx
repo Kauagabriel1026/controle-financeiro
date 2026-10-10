@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
-import { api } from '../api.js'
+import { api, baixar } from '../api.js'
 import Aviso from '../components/Aviso.jsx'
 import ContaForm from '../components/ContaForm.jsx'
 import { dataBR, hojeISO, limitesDoMes, mesDe, moeda, nomeDoMes, somarMeses } from '../formato.js'
@@ -75,6 +75,13 @@ export default function Contas() {
     executar(() => api(`/contas/${conta.id}`, { metodo: 'DELETE' }))
   }
 
+  // Exporta as contas dos filtros que estão na tela, todas as páginas.
+  const exportar = () => executar(() => baixar(
+    '/contas/exportar',
+    mes === 'todos' ? 'contas.csv' : `contas-${mes}.csv`,
+    { ...periodo, tipo, status },
+  ))
+
   function fecharJanela() {
     setEmEdicao(null)
     if (parametros.get('nova')) filtrar({})
@@ -84,7 +91,10 @@ export default function Contas() {
     <>
       <header className="cabecalho">
         <h1>Contas</h1>
-        <button type="button" className="botao" onClick={() => setEmEdicao({})}>Nova conta</button>
+        <div className="acoes-cabecalho">
+          <button type="button" className="botao secundario" disabled={ocupado} onClick={exportar}>Exportar CSV</button>
+          <button type="button" className="botao" onClick={() => setEmEdicao({})}>Nova conta</button>
+        </div>
       </header>
 
       <div className="filtros">

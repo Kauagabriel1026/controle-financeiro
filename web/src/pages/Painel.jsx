@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 import { api } from '../api.js'
 import Aviso from '../components/Aviso.jsx'
+import GastosPorCategoria from '../components/GastosPorCategoria.jsx'
 import GraficoFluxo from '../components/GraficoFluxo.jsx'
 import { hojeISO, limitesDoMes, mesDe, moeda, nomeDoMes, somarMeses } from '../formato.js'
 import { useCarregar } from '../useCarregar.js'
@@ -13,18 +14,19 @@ export default function Painel() {
   const ate = limitesDoMes(somarMeses(mesAtual, 5)).ate
 
   const { dados, erro, carregando } = useCarregar(async () => {
-    const [fluxo, vencidas] = await Promise.all([
+    const [fluxo, vencidas, gastos] = await Promise.all([
       api('/fluxo-caixa', { query: { de, ate } }),
       api('/contas', { query: { status: 'vencida' } }),
+      api('/gastos-por-categoria', { query: limitesDoMes(mesAtual) }),
     ])
 
-    return { fluxo, vencidas: vencidas.meta.total }
+    return { fluxo, vencidas: vencidas.meta.total, gastos }
   }, mesAtual)
 
   if (carregando) return <p className="carregando">Carregando…</p>
   if (erro) return <Aviso>{erro}</Aviso>
 
-  const { fluxo, vencidas } = dados
+  const { fluxo, vencidas, gastos } = dados
   const esteMes = fluxo.meses[0]
 
   return (
@@ -60,6 +62,11 @@ export default function Painel() {
           <Link to="/contas?status=vencida&mes=todos">Ver contas vencidas</Link>
         </p>
       )}
+
+      <section className="bloco">
+        <h2>Gastos do mês por categoria</h2>
+        <GastosPorCategoria gastos={gastos} />
+      </section>
 
       <section className="bloco">
         <h2>Fluxo de caixa em seis meses</h2>

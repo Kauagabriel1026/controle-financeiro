@@ -17,6 +17,7 @@ export default function ContaForm({ conta, categorias, aoSalvar, aoFechar }) {
     centavos: conta ? valorParaCentavos(conta.valor) : 0,
     vencimento: conta?.vencimento ?? hojeISO(),
     categoria_id: conta?.categoria?.id ?? '',
+    repetir_meses: '1',
   })
   const [erros, setErros] = useState({})
   const [erro, setErro] = useState('')
@@ -49,6 +50,9 @@ export default function ContaForm({ conta, categorias, aoSalvar, aoFechar }) {
       // O <select> devolve texto; a API espera o número da categoria ou nulo.
       categoria_id: form.categoria_id ? Number(form.categoria_id) : null,
     }
+
+    // A repetição só existe ao criar; ao editar, só esta conta muda.
+    if (!conta) corpo.repetir_meses = Number(form.repetir_meses)
 
     try {
       if (conta) {
@@ -115,6 +119,21 @@ export default function ContaForm({ conta, categorias, aoSalvar, aoFechar }) {
           </select>
           {erros.categoria_id && <span className="erro-campo">{erros.categoria_id[0]}</span>}
         </label>
+
+        {!conta && (
+          <label>
+            Repetir
+            <select value={form.repetir_meses} onChange={mudar('repetir_meses')}>
+              <option value="1">Não repetir</option>
+              <option value="3">Todo mês, por 3 meses</option>
+              <option value="6">Todo mês, por 6 meses</option>
+              <option value="12">Todo mês, por 12 meses</option>
+              <option value="24">Todo mês, por 24 meses</option>
+            </select>
+            <span className="dica">Cria uma conta igual em cada mês, no mesmo dia do vencimento.</span>
+            {erros.repetir_meses && <span className="erro-campo">{erros.repetir_meses[0]}</span>}
+          </label>
+        )}
 
         <div className="acoes-janela">
           <button type="button" className="botao secundario" onClick={() => janela.current.close()}>Cancelar</button>

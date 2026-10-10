@@ -32,7 +32,7 @@ export function salvarToken(token) {
  * resposta e transforma qualquer falha em ErroApi, com a mensagem pronta
  * para mostrar na tela.
  */
-export async function api(caminho, { metodo = 'GET', corpo, query = {}, manterVivo = false } = {}) {
+export async function api(caminho, { metodo = 'GET', corpo, query = {}, manterVivo = false, arquivo = false } = {}) {
   const url = new URL(BASE + caminho)
 
   for (const [chave, valor] of Object.entries(query)) {
@@ -62,6 +62,9 @@ export async function api(caminho, { metodo = 'GET', corpo, query = {}, manterVi
 
   if (resposta.status === 204) return null
 
+  // Arquivo para download (o CSV de contas) volta como está, sem virar JSON.
+  if (resposta.ok && arquivo) return resposta.blob()
+
   const dados = await resposta.json().catch(() => null)
 
   if (!resposta.ok) {
@@ -79,4 +82,16 @@ export async function api(caminho, { metodo = 'GET', corpo, query = {}, manterVi
   }
 
   return dados
+}
+
+/** Busca um arquivo na API e manda o navegador salvá-lo com o nome dado. */
+export async function baixar(caminho, nomeDoArquivo, query = {}) {
+  const conteudo = await api(caminho, { query, arquivo: true })
+  const endereco = URL.createObjectURL(conteudo)
+  const link = document.createElement('a')
+
+  link.href = endereco
+  link.download = nomeDoArquivo
+  link.click()
+  URL.revokeObjectURL(endereco)
 }

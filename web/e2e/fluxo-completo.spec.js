@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+
 import { expect, test } from '@playwright/test'
 
 import { dataBR, hojeISO, nomeDoMes } from '../src/formato.js'
@@ -26,7 +28,7 @@ async function criarUsuario(page, nome) {
   return email
 }
 
-async function criarConta(page, { tipo, descricao, valor, vencimento, categoria }) {
+async function criarConta(page, { tipo, descricao, valor, vencimento, categoria, repetir }) {
   await page.getByRole('button', { name: 'Nova conta' }).click()
 
   const janela = page.getByRole('dialog')
@@ -34,8 +36,9 @@ async function criarConta(page, { tipo, descricao, valor, vencimento, categoria 
   await janela.getByLabel(tipo).check()
   await janela.getByLabel('Descrição').fill(descricao)
   await janela.getByLabel('Valor (R$)').fill(valor)
-  await janela.getByLabel('Vencimento').fill(vencimento)
+  await janela.getByLabel('Vencimento', { exact: true }).fill(vencimento)
   if (categoria) await janela.getByLabel('Categoria').selectOption({ label: categoria })
+  if (repetir) await janela.getByLabel('Repetir').selectOption({ label: repetir })
   await janela.getByRole('button', { name: 'Salvar conta' }).click()
   await expect(janela).toBeHidden()
 }
@@ -101,6 +104,21 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(aluguel).toContainText('Vencida')
   await expect(pagamento).toContainText('Pendente')
 
+  // --- Conta recorrente: uma conta por mês, por três meses ---
+  await criarConta(page, { tipo: 'A pagar', descricao: 'Internet fibra', valor: '12990', vencimento: hoje, categoria: 'Outros', repetir: 'Todo mês, por 3 meses' })
+  await expect(page.getByRole('row').filter({ hasText: 'Internet fibra' })).toHaveCount(3)
+
+  // --- Exportação: o arquivo traz as contas que estão na tela ---
+  const esperaDownload = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Exportar CSV' }).click()
+  const download = await esperaDownload
+  const csv = readFileSync(await download.path(), 'utf8')
+
+  expect(download.suggestedFilename()).toBe('contas.csv')
+  expect(csv).toContain('Vencimento;Descrição;Categoria;Tipo;Valor;Situação')
+  expect(csv).toContain(`${dataBR(ontem)};Aluguel;Moradia;"A pagar";1500,10;Vencida;`)
+  expect(csv.match(/Internet fibra/g)).toHaveLength(3)
+
   // --- Campo de valor: os centavos entram pela direita, como em app de banco ---
   await page.getByRole('button', { name: 'Nova conta' }).click()
   const campoValor = page.getByRole('dialog').getByLabel('Valor (R$)')
@@ -121,6 +139,7 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await page.getByRole('link', { name: 'Painel' }).click()
   await expect(page.getByText('Há 1 conta vencida em aberto.')).toBeVisible()
   await expect(page.getByLabel('Resumo do mês')).toContainText('R$ 5.200,00')
+  await expect(page.locator('.gastos li').filter({ hasText: 'Outros' })).toContainText('R$ 129,90')
   await page.getByRole('link', { name: 'Ver contas vencidas' }).click()
   await expect(aluguel).toBeVisible()
   await expect(pagamento).toHaveCount(0)

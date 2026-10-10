@@ -18,6 +18,7 @@ return [
         'string' => 'O campo :attribute não pode ter mais de :max caracteres.',
     ],
     'min' => [
+        'numeric' => 'O campo :attribute deve ser no mínimo :min.',
         'string' => 'O campo :attribute deve ter pelo menos :min caracteres.',
     ],
     'numeric' => 'O campo :attribute deve ser um número.',
@@ -35,6 +36,7 @@ return [
         'valor' => 'valor',
         'vencimento' => 'vencimento',
         'pago_em' => 'data de pagamento',
+        'repetir_meses' => 'quantidade de meses',
         'categoria_id' => 'categoria',
         'de' => 'data inicial',
         'ate' => 'data final',
