@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { useAuth } from '../auth.jsx'
+import Marca from './Marca.jsx'
 
 export default function Layout() {
   const { usuario, sair } = useAuth()
@@ -8,7 +9,7 @@ export default function Layout() {
   return (
     <div className="app">
       <aside className="lateral">
-        <p className="marca">Controle Financeiro</p>
+        <Marca />
 
         <nav aria-label="Principal">
           <NavLink to="/" end>Painel</NavLink>

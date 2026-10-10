@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { useAuth } from '../auth.jsx'
 import Aviso from '../components/Aviso.jsx'
+import TelaDeEntrada from '../components/TelaDeEntrada.jsx'
 
 export default function Cadastro() {
   const { cadastrar } = useAuth()
@@ -29,7 +30,7 @@ export default function Cadastro() {
   }
 
   return (
-    <div className="entrada">
+    <TelaDeEntrada>
       <form className="entrada-form" onSubmit={enviar}>
         <h1>Criar conta</h1>
         <p className="entrada-sub">Seus lançamentos ficam visíveis só para você.</p>
@@ -68,6 +69,6 @@ export default function Cadastro() {
           Já tem conta? <Link to="/login">Entrar</Link>
         </p>
       </form>
-    </div>
+    </TelaDeEntrada>
   )
 }

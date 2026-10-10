@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { useAuth } from '../auth.jsx'
 import Aviso from '../components/Aviso.jsx'
+import TelaDeEntrada from '../components/TelaDeEntrada.jsx'
 
 export default function Login() {
   const { entrar } = useAuth()
@@ -25,10 +26,10 @@ export default function Login() {
   }
 
   return (
-    <div className="entrada">
+    <TelaDeEntrada>
       <form className="entrada-form" onSubmit={enviar}>
-        <h1>Controle Financeiro</h1>
-        <p className="entrada-sub">Entre para ver suas contas a pagar e a receber.</p>
+        <h1>Entrar</h1>
+        <p className="entrada-sub">Acesse suas contas a pagar e a receber.</p>
 
         <Aviso>{erro}</Aviso>
 
@@ -50,6 +51,6 @@ export default function Login() {
           Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
         </p>
       </form>
-    </div>
+    </TelaDeEntrada>
   )
 }

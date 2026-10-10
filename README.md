@@ -1,4 +1,4 @@
-# Controle Financeiro
+# Kamel Controle Financeiro
 
 Sistema de contas a pagar e a receber com fluxo de caixa por período. API em Laravel com PostgreSQL e front-end em React.
 
