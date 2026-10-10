@@ -4,6 +4,8 @@
 
 Sistema de contas a pagar e a receber com fluxo de caixa por período. API em Laravel com PostgreSQL e front-end em React.
 
+**Acesse:** https://kamel-controle-financeiro.vercel.app — clique em **Ver demonstração** para entrar sem cadastro, em uma conta com dados de exemplo. A API fica em hospedagem gratuita e pode levar até um minuto para responder no primeiro acesso.
+
 ![Painel com os indicadores do mês, o fluxo de caixa, as próximas contas e os totais por categoria](docs/painel.png)
 
 ![Lista de contas com filtros por mês, tipo e situação](docs/contas.png)
@@ -120,7 +122,7 @@ Variável de ambiente do front-end, lida no momento do build:
 | --- | --- |
 | `VITE_API_URL` | Endereço da API, terminando em `/api` |
 
-O arquivo `render.yaml` descreve a API para o Render e o `web/vercel.json` configura o front-end no Vercel.
+Em produção o front-end está no Vercel, a API no Render e o banco no Neon. O arquivo `render.yaml` descreve a API para o Render e o `web/vercel.json` configura o front-end no Vercel.
 
 ## Comandos úteis
 
