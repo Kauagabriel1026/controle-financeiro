@@ -17,7 +17,7 @@ As imagens mostram o sistema com dados de exemplo.
 - Docker e Docker Compose
 - Laravel Sanctum para autenticação por token
 - React 19 com Vite e React Router
-- PHPUnit, Vitest e GitHub Actions
+- PHPUnit, Vitest, Playwright e GitHub Actions
 
 ## Como rodar
 
@@ -106,6 +106,9 @@ docker compose exec api php artisan test
 
 # Rodar os testes do front-end
 docker compose exec web npm test
+
+# Rodar o teste de ponta a ponta (com o sistema no ar; baixa um navegador na primeira vez)
+cd web && npm install && npx playwright install chromium && npm run test:e2e
 
 # Criar as tabelas do zero
 docker compose exec api php artisan migrate:fresh

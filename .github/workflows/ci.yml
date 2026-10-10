@@ -50,10 +50,14 @@ jobs:
           DB_HOST: 127.0.0.1
 
       - name: Rodar testes
-        run: php artisan test
+        run: |
+          php artisan test | tee resultado.txt
+          echo "::notice title=Testes da API (SQLite)::$(grep -E 'Tests:' resultado.txt | sed 's/\x1b\[[0-9;]*m//g' | xargs)"
 
       - name: Rodar testes no PostgreSQL
-        run: php artisan test
+        run: |
+          php artisan test | tee resultado.txt
+          echo "::notice title=Testes da API (PostgreSQL)::$(grep -E 'Tests:' resultado.txt | sed 's/\x1b\[[0-9;]*m//g' | xargs)"
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
@@ -85,3 +89,68 @@ jobs:
 
       - name: Gerar a versão de produção
         run: npm run build
+
+  # Ponta a ponta: um navegador de verdade usando o front e a API reais, com PostgreSQL.
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: controle_financeiro
+          POSTGRES_USER: financeiro
+          POSTGRES_PASSWORD: financeiro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U financeiro -d controle_financeiro"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo_pgsql
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Subir a API
+        working-directory: api
+        run: |
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          php artisan key:generate
+          php artisan migrate --force
+          php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/servidor.log 2>&1 &
+          curl --silent --fail --retry 15 --retry-delay 1 --retry-connrefused http://127.0.0.1:8000/api/health
+
+      - name: Preparar o front-end
+        working-directory: web
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run build
+
+      - name: Rodar o teste de ponta a ponta
+        working-directory: web
+        run: npm run test:e2e
+
+      - name: Mostrar o log da API se algo falhar
+        if: failure()
+        working-directory: api
+        run: |
+          registro=$(tail -c 3000 storage/logs/laravel.log 2>/dev/null || echo "sem laravel.log")
+          registro="${registro//'%'/'%25'}"
+          registro="${registro//$'\n'/'%0A'}"
+          echo "::error title=Log da API::$registro"
