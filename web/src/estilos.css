@@ -381,9 +381,26 @@ select {
 }
 
 .entrada-lado {
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
   padding: 2rem 1.5rem;
+}
+
+.entrada-projeto {
+  max-width: 380px;
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--linha);
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+
+.entrada-projeto a {
+  color: var(--azul-escuro);
+  font-weight: 600;
 }
 
 .entrada-form {

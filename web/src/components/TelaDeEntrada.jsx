@@ -14,7 +14,13 @@ export default function TelaDeEntrada({ children }) {
         </ul>
       </div>
 
-      <div className="entrada-lado">{children}</div>
+      <div className="entrada-lado">
+        {children}
+        <p className="entrada-projeto">
+          Projeto de portfólio de Kauã Gabriel, para estudo e demonstração. Não é um banco nem um serviço financeiro.{' '}
+          <a href="https://github.com/Kauagabriel1026/kamel-controle-financeiro" target="_blank" rel="noreferrer">Ver o código no GitHub</a>
+        </p>
+      </div>
     </div>
   )
 }
