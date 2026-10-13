@@ -1,5 +1,9 @@
 import { defineConfig } from '@playwright/test'
 
+// O teste calcula "hoje" e "ontem" no Node. Sem isto, entre 21h e meia-noite
+// o Node (em UTC no CI) já está no dia seguinte ao do navegador e da API.
+process.env.TZ = 'America/Sao_Paulo'
+
 // Testes de ponta a ponta: um navegador de verdade usando o front e a API reais.
 export default defineConfig({
   testDir: './e2e',

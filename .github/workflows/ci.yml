@@ -172,7 +172,14 @@ jobs:
 
       - name: Rodar os testes dentro dos contêineres
         run: |
-          docker compose exec -T api php artisan test
+          if ! docker compose exec -T api php artisan test > resultado-api.txt 2>&1; then
+            registro=$(sed 's/\x1b\[[0-9;]*m//g' resultado-api.txt | grep -B2 -A25 -E 'FAIL|Failed|Error' | head -c 3500)
+            registro="${registro//'%'/'%25'}"
+            registro="${registro//$'\n'/'%0A'}"
+            echo "::error title=Testes da API no Docker::$registro"
+            exit 1
+          fi
+          echo "::notice title=Testes da API no Docker::$(grep -E 'Tests:' resultado-api.txt | sed 's/\x1b\[[0-9;]*m//g' | xargs)"
           docker compose exec -T web npm test
 
       - name: Medir o tempo de resposta da API

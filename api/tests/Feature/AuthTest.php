@@ -147,8 +147,7 @@ class AuthTest extends TestCase
 
         $novo = $user->fresh()->password;
 
-        // Nos testes o custo configurado é 4 (phpunit.xml).
-        $this->assertSame(4, password_get_info($novo)['options']['cost']);
+        $this->assertSame((int) config('hashing.bcrypt.rounds'), password_get_info($novo)['options']['cost']);
         $this->assertTrue(password_verify('senha-segura', $novo));
 
         // Continua entrando com a mesma senha depois da troca do hash.
