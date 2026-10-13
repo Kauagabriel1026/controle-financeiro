@@ -84,3 +84,18 @@ export function valorParaCentavos(valor) {
 export function centavosParaValor(centavos) {
   return (centavos / 100).toFixed(2)
 }
+
+/** "kaua gabriel ricardo ribeiro" -> "KR": primeira letra do primeiro e do último nome. */
+export function iniciais(nome) {
+  const partes = nome.trim().split(/\s+/).filter(Boolean)
+  const letras = partes.length > 1 ? partes[0][0] + partes.at(-1)[0] : (partes[0] ?? '?').slice(0, 2)
+
+  return letras.toUpperCase()
+}
+
+/** "kaua gabriel" -> "Kaua": o primeiro nome, com a inicial maiúscula. */
+export function primeiroNome(nome) {
+  const primeiro = nome.trim().split(/\s+/)[0] ?? ''
+
+  return primeiro.charAt(0).toUpperCase() + primeiro.slice(1)
+}

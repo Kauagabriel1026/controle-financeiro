@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\ContaController;
 use App\Http\Controllers\Api\FluxoCaixaController;
+use App\Http\Controllers\Api\PerfilController;
 use App\Http\Controllers\Api\RedefinicaoDeSenhaController;
 use App\Http\Controllers\Api\TotaisPorCategoriaController;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,8 @@ Route::middleware('throttle:10,1')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/eu', [AuthController::class, 'eu']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::put('/perfil', [PerfilController::class, 'update']);
+    Route::put('/perfil/senha', [PerfilController::class, 'trocarSenha'])->middleware('throttle:10,1');
 
     Route::get('/categorias', [CategoriaController::class, 'index']);
     Route::post('/categorias', [CategoriaController::class, 'store']);

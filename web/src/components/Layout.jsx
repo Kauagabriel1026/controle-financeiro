@@ -2,9 +2,10 @@ import { NavLink, Outlet } from 'react-router-dom'
 
 import { useAuth } from '../auth.jsx'
 import Marca from './Marca.jsx'
+import MenuUsuario from './MenuUsuario.jsx'
 
 export default function Layout() {
-  const { usuario, sair } = useAuth()
+  const { usuario } = useAuth()
 
   return (
     <div className="app">
@@ -17,13 +18,17 @@ export default function Layout() {
           <NavLink to="/categorias">Categorias</NavLink>
         </nav>
 
-        <div className="sessao">
-          <p>{usuario.name}</p>
-          <button type="button" className="botao-texto" onClick={sair}>Sair</button>
+        {/* No celular a lateral vira cabeçalho, e o menu da conta fica nele. */}
+        <div className="conta-celular">
+          <MenuUsuario compacto />
         </div>
       </aside>
 
       <main className="conteudo">
+        <div className="topo">
+          <MenuUsuario />
+        </div>
+
         {usuario.demonstracao && (
           <p className="faixa-demonstracao" role="note">
             Você está em uma conta de demonstração. Os dados são de exemplo e ficam guardados por 24 horas.

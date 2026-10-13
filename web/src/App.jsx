@@ -9,6 +9,7 @@ import Contas from './pages/Contas.jsx'
 import EsqueciSenha from './pages/EsqueciSenha.jsx'
 import Login from './pages/Login.jsx'
 import Painel from './pages/Painel.jsx'
+import Perfil from './pages/Perfil.jsx'
 import RedefinirSenha from './pages/RedefinirSenha.jsx'
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/" element={<Painel />} />
         <Route path="/contas" element={<Contas />} />
         <Route path="/categorias" element={<Categorias />} />
+        <Route path="/perfil" element={<Perfil />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

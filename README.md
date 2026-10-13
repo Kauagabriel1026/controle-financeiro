@@ -59,6 +59,8 @@ Todas as rotas ficam em `http://localhost:8000/api`. As rotas marcadas com 🔒 
 | POST | `/redefinir-senha` | Troca a senha com o token do link e encerra as sessões abertas |
 | GET | `/eu` 🔒 | Dados do usuário logado |
 | POST | `/logout` 🔒 | Invalida o token usado |
+| PUT | `/perfil` 🔒 | Atualiza nome, e-mail, perfil financeiro e tema |
+| PUT | `/perfil/senha` 🔒 | Troca a senha e encerra as outras sessões |
 
 ### Categorias 🔒
 
@@ -181,3 +183,4 @@ docker compose down
 - [x] Front-end em React
 - [x] Contas recorrentes, exportação em CSV e gastos e ganhos por categoria
 - [x] Imagem de produção, CORS restrito e conta de demonstração
+- [x] Esqueci minha senha, perfil do usuário e tema escuro

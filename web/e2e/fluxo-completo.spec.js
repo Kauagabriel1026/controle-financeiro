@@ -37,6 +37,12 @@ async function criarUsuario(page, nome) {
   return email
 }
 
+/** Abre o menu da conta, no topo da tela, e clica em Sair. */
+async function sair(page) {
+  await page.getByRole('button', { name: /^Olá, / }).click()
+  await page.getByRole('menuitem', { name: 'Sair' }).click()
+}
+
 async function criarConta(page, { tipo, descricao, valor, vencimento, categoria, repetir }) {
   await page.getByRole('button', { name: 'Nova conta' }).click()
 
@@ -216,6 +222,39 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await page.getByRole('button', { name: 'Voltar para o mês atual' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(nomeDoMes(hoje.slice(0, 7)))
 
+  // --- Perfil: nome, perfil financeiro e tema ficam salvos na conta ---
+  await page.getByRole('button', { name: 'Olá, Ana' }).click()
+  await page.getByRole('menuitem', { name: 'Meu perfil' }).click()
+  await expect(page.getByRole('heading', { name: 'Meu perfil' })).toBeVisible()
+
+  await page.getByLabel('Nome').fill('Ana Lima')
+  await page.getByRole('button', { name: 'Salvar dados' }).click()
+  await expect(page.getByRole('button', { name: 'Olá, Ana' })).toBeVisible()
+  await expect(page.locator('.avatar').first()).toHaveText('AL')
+
+  await page.getByLabel('Renda mensal aproximada (R$)').fill('520000')
+  await page.getByLabel('Dia em que você recebe').fill('5')
+  await page.getByLabel('Objetivo principal').selectOption({ label: 'Montar uma reserva de emergência' })
+  await page.getByLabel('Quanto quer guardar por mês (R$)').fill('80000')
+  await page.getByRole('button', { name: 'Salvar perfil financeiro' }).click()
+  await expect(page.locator('.salvo')).toHaveCount(2)
+
+  await page.getByText('Escuro', { exact: true }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro')
+
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro')
+  await expect(page.getByLabel('Nome')).toHaveValue('Ana Lima')
+  await expect(page.getByLabel('Renda mensal aproximada (R$)')).toHaveValue('5.200,00')
+  await expect(page.getByLabel('Dia em que você recebe')).toHaveValue('5')
+  await expect(page.getByLabel('Objetivo principal')).toHaveValue('montar_reserva')
+  await expect(page.getByLabel('Quanto quer guardar por mês (R$)')).toHaveValue('800,00')
+
+  // O menu da conta também troca o tema.
+  await page.getByRole('button', { name: 'Olá, Ana' }).click()
+  await page.getByRole('menuitem', { name: 'Usar tema claro' }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'claro')
+
   // --- Exclusão ---
   await page.getByRole('link', { name: 'Contas', exact: true }).click()
   await page.getByRole('button', { name: 'Ver todos os meses' }).click()
@@ -227,7 +266,7 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Contas' })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await sair(page)
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible()
 
   // --- Login: senha errada é recusada, senha certa entra ---
@@ -272,7 +311,7 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(nomeDoMes(hoje.slice(0, 7)))
 
   // --- Isolamento: outro usuário não vê nada da Ana ---
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await sair(page)
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible()
   await criarUsuario(page, 'Bruno')
   await page.getByRole('link', { name: 'Contas', exact: true }).click()
@@ -283,11 +322,11 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(page.getByRole('listitem').filter({ hasText: 'Reserva' })).toHaveCount(0)
 
   // --- Demonstração: entra sem cadastro, em uma conta de visitante ---
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await sair(page)
   await page.getByRole('button', { name: 'Ver demonstração' }).click()
   await expect(page.getByRole('note')).toContainText('conta de demonstração')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(nomeDoMes(hoje.slice(0, 7)))
-  await expect(page.locator('.sessao')).toContainText('Visitante')
+  await expect(page.getByRole('button', { name: 'Olá, Visitante' })).toBeVisible()
 
   expect(erros).toEqual([])
 })

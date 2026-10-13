@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 import { api, definirAoPerderSessao, lerToken, salvarToken } from './api.js'
+import { definirTema } from './tema.js'
 
 const AuthContext = createContext(null)
 
@@ -33,6 +34,11 @@ export function AuthProvider({ children }) {
     buscarUsuario()
   }, [buscarUsuario])
 
+  // O tema escolhido na conta vale em qualquer aparelho em que a pessoa entrar.
+  useEffect(() => {
+    if (usuario?.tema) definirTema(usuario.tema)
+  }, [usuario?.tema])
+
   useEffect(() => {
     definirAoPerderSessao(encerrar)
 
@@ -52,6 +58,14 @@ export function AuthProvider({ children }) {
       conferirSessao,
       entrar: async (dados) => iniciar(await api('/login', { metodo: 'POST', corpo: dados })),
       cadastrar: async (dados) => iniciar(await api('/registrar', { metodo: 'POST', corpo: dados })),
+      // Depois de salvar o perfil, a tela passa a usar os dados novos.
+      atualizarUsuario: setUsuario,
+      // Aplica o tema na hora e salva na conta em seguida.
+      mudarTema: async (tema) => {
+        definirTema(tema)
+        setUsuario((atual) => ({ ...atual, tema }))
+        await api('/perfil', { metodo: 'PUT', corpo: { tema } })
+      },
       // Entra em uma conta de visitante, criada na hora com dados de exemplo.
       demonstrar: async () => iniciar(await api('/demonstracao', { metodo: 'POST' })),
       // Sai na hora neste navegador e avisa a API em seguida. O pedido sai antes

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\ObjetivoFinanceiro;
+use App\Enums\Tema;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -30,6 +32,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'demonstracao' => 'boolean',
+            'renda_mensal' => 'decimal:2',
+            'meta_economia' => 'decimal:2',
+            'dia_pagamento' => 'integer',
+            'objetivo' => ObjetivoFinanceiro::class,
+            'tema' => Tema::class,
         ];
     }
 
@@ -41,5 +48,25 @@ class User extends Authenticatable
     public function contas(): HasMany
     {
         return $this->hasMany(Conta::class);
+    }
+
+    /**
+     * O que a API devolve sobre o usuário logado.
+     *
+     * @return array<string, mixed>
+     */
+    public function dadosParaApi(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'demonstracao' => (bool) $this->demonstracao,
+            'renda_mensal' => $this->renda_mensal,
+            'dia_pagamento' => $this->dia_pagamento,
+            'objetivo' => $this->objetivo?->value,
+            'meta_economia' => $this->meta_economia,
+            'tema' => $this->tema?->value ?? 'sistema',
+        ];
     }
 }

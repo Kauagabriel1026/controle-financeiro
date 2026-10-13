@@ -72,7 +72,7 @@ class AuthController extends Controller
 
     public function eu(Request $request): JsonResponse
     {
-        return response()->json($this->dadosDoUsuario($request->user()));
+        return response()->json($request->user()->dadosParaApi());
     }
 
     public function logout(Request $request): Response
@@ -85,21 +85,8 @@ class AuthController extends Controller
     private function respostaComToken(User $user, int $status = 200): JsonResponse
     {
         return response()->json([
-            'usuario' => $this->dadosDoUsuario($user),
+            'usuario' => $user->dadosParaApi(),
             'token' => $user->createToken('api')->plainTextToken,
         ], $status);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function dadosDoUsuario(User $user): array
-    {
-        return [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'demonstracao' => (bool) $user->demonstracao,
-        ];
     }
 }

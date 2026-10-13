@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  centavosParaTexto, centavosParaValor, dataBR, hojeISO, limitesDoMes, mesCurto, mesDe, moeda, moedaCurta, nomeDoMes, somarMeses, valorParaCentavos,
+  centavosParaTexto, centavosParaValor, dataBR, hojeISO, iniciais, limitesDoMes, mesCurto, mesDe, moeda, moedaCurta, nomeDoMes, primeiroNome, somarMeses, valorParaCentavos,
 } from './formato.js'
 
 // O Intl separa "R$" do número com um espaço não separável.
@@ -47,5 +47,13 @@ describe('formato', () => {
     expect(valorParaCentavos('0.07')).toBe(7)
     expect(centavosParaValor(150010)).toBe('1500.10')
     expect(centavosParaValor(160)).toBe('1.60')
+  })
+
+  it('monta as iniciais e o primeiro nome para o menu da conta', () => {
+    expect(iniciais('kaua gabriel ricardo ribeiro')).toBe('KR')
+    expect(iniciais('  Maria  ')).toBe('MA')
+    expect(iniciais('Ana Souza')).toBe('AS')
+    expect(primeiroNome('kaua gabriel')).toBe('Kaua')
+    expect(primeiroNome('Visitante')).toBe('Visitante')
   })
 })
