@@ -55,6 +55,8 @@ Todas as rotas ficam em `http://localhost:8000/api`. As rotas marcadas com 🔒 
 | POST | `/registrar` | Cria o usuário, com as categorias sugeridas, e devolve um token |
 | POST | `/login` | Devolve um token |
 | POST | `/demonstracao` | Cria uma conta de visitante com dados de exemplo e devolve um token |
+| POST | `/esqueci-senha` | Envia por e-mail um link para criar uma nova senha, válido por 60 minutos |
+| POST | `/redefinir-senha` | Troca a senha com o token do link e encerra as sessões abertas |
 | GET | `/eu` 🔒 | Dados do usuário logado |
 | POST | `/logout` 🔒 | Invalida o token usado |
 
@@ -115,6 +117,9 @@ Variáveis de ambiente da API:
 | `APP_KEY` | Segredo da aplicação |
 | `DB_URL` | Endereço do PostgreSQL, no formato `postgresql://usuario:senha@host/banco?sslmode=require` |
 | `CORS_ALLOWED_ORIGINS` | Endereço do front-end, o único site autorizado a chamar a API pelo navegador |
+| `FRONT_URL` | Endereço do front-end, usado no link de redefinição de senha |
+| `BREVO_API_KEY` | Chave da API do [Brevo](https://www.brevo.com), que envia os e-mails |
+| `MAIL_FROM_ADDRESS` | Remetente dos e-mails, verificado no Brevo |
 
 Variável de ambiente do front-end, lida no momento do build:
 
@@ -123,6 +128,8 @@ Variável de ambiente do front-end, lida no momento do build:
 | `VITE_API_URL` | Endereço da API, terminando em `/api` |
 
 Em produção o front-end está no Vercel, a API no Render e o banco no Neon. O arquivo `render.yaml` descreve a API para o Render e o `web/vercel.json` configura o front-end no Vercel.
+
+Sem `BREVO_API_KEY`, nenhum e-mail é enviado. No ambiente local, o link de redefinição de senha aparece em `api/storage/logs/laravel.log`.
 
 ## Comandos úteis
 

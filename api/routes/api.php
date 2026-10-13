@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\ContaController;
 use App\Http\Controllers\Api\FluxoCaixaController;
+use App\Http\Controllers\Api\RedefinicaoDeSenhaController;
 use App\Http\Controllers\Api\TotaisPorCategoriaController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,8 @@ Route::middleware('throttle:10,1')->group(function () {
     Route::post('/registrar', [AuthController::class, 'registrar']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/demonstracao', [AuthController::class, 'demonstracao']);
+    Route::post('/esqueci-senha', [RedefinicaoDeSenhaController::class, 'enviarLink']);
+    Route::post('/redefinir-senha', [RedefinicaoDeSenhaController::class, 'redefinir']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

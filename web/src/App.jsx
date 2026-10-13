@@ -6,8 +6,10 @@ import Layout from './components/Layout.jsx'
 import Cadastro from './pages/Cadastro.jsx'
 import Categorias from './pages/Categorias.jsx'
 import Contas from './pages/Contas.jsx'
+import EsqueciSenha from './pages/EsqueciSenha.jsx'
 import Login from './pages/Login.jsx'
 import Painel from './pages/Painel.jsx'
+import RedefinirSenha from './pages/RedefinirSenha.jsx'
 
 export default function App() {
   const { usuario, carregando, falhaDeConexao, conferirSessao } = useAuth()
@@ -30,6 +32,8 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
+        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     )

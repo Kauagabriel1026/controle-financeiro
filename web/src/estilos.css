@@ -429,6 +429,25 @@ select {
   font-weight: 600;
 }
 
+/* Confirmações nas telas de entrada: link enviado, senha alterada. */
+.entrada-form .nota {
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border-left: 4px solid var(--azul);
+  border-radius: var(--raio);
+  background: var(--azul-claro);
+  color: var(--tinta);
+  font-size: 0.875rem;
+}
+
+.entrada-form .esqueci {
+  align-self: flex-end;
+  margin-top: -0.5rem;
+  color: var(--azul-escuro);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 .entrada-dica {
   margin: -0.5rem 0 0;
   font-size: 0.8125rem;

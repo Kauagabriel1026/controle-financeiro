@@ -5,6 +5,15 @@ import { expect, test } from '@playwright/test'
 import { dataBR, hojeISO, nomeDoMes } from '../src/formato.js'
 
 const SENHA = 'senha-de-teste'
+const NOVA_SENHA = 'senha-nova-de-teste'
+const LOG_DA_API = new URL('../../api/storage/logs/laravel.log', import.meta.url)
+
+/** Sem serviço de e-mail configurado, a API grava o link de redefinição no log. */
+function ultimoLinkDeRedefinicao() {
+  const links = [...readFileSync(LOG_DA_API, 'utf8').matchAll(/"link":"([^"]+)"/g)]
+
+  return links.at(-1)[1].replaceAll('\\/', '/')
+}
 
 function diasAtras(dias) {
   const data = new Date()
@@ -209,7 +218,35 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await page.getByRole('button', { name: 'Entrar' }).click()
   await expect(page.getByRole('alert')).toHaveText('E-mail ou senha inválidos.')
 
+  // --- Esqueci minha senha: o link sai no log da API (sem serviço de e-mail no teste) ---
+  await page.getByRole('link', { name: 'Esqueci minha senha' }).click()
+  await page.getByLabel('E-mail').fill(email)
+  await page.getByRole('button', { name: 'Enviar link' }).click()
+  await expect(page.getByRole('status')).toContainText('Se o e-mail estiver cadastrado')
+
+  await page.goto(ultimoLinkDeRedefinicao())
+  await expect(page.getByRole('heading', { name: 'Criar nova senha' })).toBeVisible()
+  await page.locator('input[autocomplete="new-password"]').nth(0).fill(NOVA_SENHA)
+  await page.getByLabel('Repita a nova senha').fill(NOVA_SENHA)
+  await page.getByRole('button', { name: 'Salvar nova senha' }).click()
+  await expect(page.getByRole('status')).toHaveText('Senha alterada. Entre com a nova senha.')
+  await expect(page.getByLabel('E-mail')).toHaveValue(email)
+
+  // O mesmo link não serve duas vezes.
+  const linkUsado = ultimoLinkDeRedefinicao()
+  await page.goto(linkUsado)
+  await page.locator('input[autocomplete="new-password"]').nth(0).fill('outra-senha-123')
+  await page.getByLabel('Repita a nova senha').fill('outra-senha-123')
+  await page.getByRole('button', { name: 'Salvar nova senha' }).click()
+  await expect(page.getByRole('alert')).toHaveText('Este link é inválido ou já expirou. Peça um novo.')
+
+  // A senha antiga não entra mais; a nova entra.
+  await page.goto('/login')
+  await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill(SENHA)
+  await page.getByRole('button', { name: 'Entrar' }).click()
+  await expect(page.getByRole('alert')).toHaveText('E-mail ou senha inválidos.')
+  await page.getByLabel('Senha').fill(NOVA_SENHA)
   await page.getByRole('button', { name: 'Entrar' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(nomeDoMes(hoje.slice(0, 7)))
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { useAuth } from '../auth.jsx'
 import Aviso from '../components/Aviso.jsx'
@@ -7,7 +7,9 @@ import TelaDeEntrada from '../components/TelaDeEntrada.jsx'
 
 export default function Login() {
   const { entrar, demonstrar } = useAuth()
-  const [email, setEmail] = useState('')
+  // Depois de criar uma nova senha, a tela de redefinição manda para cá um aviso e o e-mail.
+  const { state } = useLocation()
+  const [email, setEmail] = useState(state?.email ?? '')
   const [password, setPassword] = useState('')
   const [erro, setErro] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -57,6 +59,7 @@ export default function Login() {
         <h1>Entrar</h1>
         <p className="entrada-sub">Acesse suas contas a pagar e a receber.</p>
 
+        {state?.aviso && !erro && <p className="nota" role="status">{state.aviso}</p>}
         <Aviso>{erro}</Aviso>
 
         <label>
@@ -68,6 +71,7 @@ export default function Login() {
           Senha
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
         </label>
+        <Link className="esqueci" to="/esqueci-senha">Esqueci minha senha</Link>
 
         <button type="submit" className="botao" disabled={Boolean(enviando)}>
           {enviando === 'login' ? 'Entrando…' : 'Entrar'}

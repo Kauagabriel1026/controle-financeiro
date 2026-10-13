@@ -65,6 +65,9 @@ return [
     |
     */
 
+    // Endereço do front-end, usado nos links enviados por e-mail.
+    'front_url' => env('FRONT_URL', 'http://localhost:5173'),
+
     'timezone' => env('APP_TIMEZONE', 'America/Sao_Paulo'),
 
     /*
