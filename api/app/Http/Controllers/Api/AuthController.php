@@ -14,6 +14,9 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /** Hash de uma senha qualquer, usado quando o e-mail informado não existe. */
+    private const HASH_FICTICIO = '$2y$10$kKbypR.c37K6t/2uHnTiIuOCZIZitPb4rdEYlIV9RwVjevVq7ao8e';
+
     public function registrar(Request $request): JsonResponse
     {
         $dados = $request->validate([
@@ -37,10 +40,20 @@ class AuthController extends Controller
 
         $user = User::where('email', $dados['email'])->first();
 
-        if (! $user || ! Hash::check($dados['password'], $user->password)) {
+        // A senha é conferida mesmo quando o e-mail não existe, para a resposta
+        // levar o mesmo tempo nos dois casos e não revelar quem tem cadastro.
+        $senhaConfere = Hash::check($dados['password'], $user?->password ?? self::HASH_FICTICIO);
+
+        if (! $user || ! $senhaConfere) {
             throw ValidationException::withMessages([
                 'email' => ['E-mail ou senha inválidos.'],
             ]);
+        }
+
+        // Senhas guardadas com outro custo (de antes de uma mudança na
+        // configuração) são refeitas com o custo atual no primeiro login.
+        if (Hash::needsRehash($user->password)) {
+            $user->forceFill(['password' => $dados['password']])->save();
         }
 
         return $this->respostaComToken($user);

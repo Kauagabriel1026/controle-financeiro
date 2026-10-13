@@ -123,4 +123,38 @@ class AuthTest extends TestCase
             'password' => 'senha-errada',
         ])->assertTooManyRequests();
     }
+
+    public function test_login_com_email_inexistente_responde_como_senha_errada(): void
+    {
+        $this->postJson('/api/login', [
+            'email' => 'ninguem@example.com',
+            'password' => 'qualquer-senha',
+        ])->assertUnprocessable()
+            ->assertJsonPath('errors.email.0', 'E-mail ou senha inválidos.');
+    }
+
+    public function test_senha_guardada_com_outro_custo_e_refeita_no_login(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'antiga@example.com',
+            'password' => password_hash('senha-segura', PASSWORD_BCRYPT, ['cost' => 12]),
+        ]);
+
+        $this->postJson('/api/login', [
+            'email' => 'antiga@example.com',
+            'password' => 'senha-segura',
+        ])->assertOk();
+
+        $novo = $user->fresh()->password;
+
+        // Nos testes o custo configurado é 4 (phpunit.xml).
+        $this->assertSame(4, password_get_info($novo)['options']['cost']);
+        $this->assertTrue(password_verify('senha-segura', $novo));
+
+        // Continua entrando com a mesma senha depois da troca do hash.
+        $this->postJson('/api/login', [
+            'email' => 'antiga@example.com',
+            'password' => 'senha-segura',
+        ])->assertOk();
+    }
 }
