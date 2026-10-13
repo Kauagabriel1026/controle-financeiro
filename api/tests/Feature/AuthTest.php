@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Support\CategoriasSugeridas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -135,8 +136,11 @@ class AuthTest extends TestCase
 
     public function test_senha_guardada_com_outro_custo_e_refeita_no_login(): void
     {
-        $user = User::factory()->create([
-            'email' => 'antiga@example.com',
+        $user = User::factory()->create(['email' => 'antiga@example.com']);
+
+        // Gravado direto no banco: pelo model, o Laravel recusa um hash com
+        // custo diferente do configurado.
+        DB::table('users')->where('id', $user->id)->update([
             'password' => password_hash('senha-segura', PASSWORD_BCRYPT, ['cost' => 12]),
         ]);
 
