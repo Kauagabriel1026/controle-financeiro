@@ -95,7 +95,7 @@ export default function Login() {
         <button type="button" className="botao secundario" disabled={Boolean(enviando) || aguardandoCaptcha} onClick={verDemonstracao}>
           {enviando === 'demonstracao' ? 'Preparando a demonstração…' : 'Ver demonstração'}
         </button>
-        <p className="entrada-dica">Abre uma conta de visitante com dados de exemplo, sem cadastro.</p>
+        <p className="entrada-dica">Teste todas as funções agora, sem cadastro. Os dados são de exemplo.</p>
 
         {demorando && (
           <p className="entrada-dica" role="status">O servidor estava em repouso e está ligando. Isso leva até um minuto.</p>
