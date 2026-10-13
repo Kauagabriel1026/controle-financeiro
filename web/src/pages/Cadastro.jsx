@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 
 import { useAuth } from '../auth.jsx'
 import Aviso from '../components/Aviso.jsx'
+import { CAPTCHA_ATIVO } from '../captcha.js'
+import Captcha from '../components/Captcha.jsx'
 import TelaDeEntrada from '../components/TelaDeEntrada.jsx'
 
 export default function Cadastro() {
@@ -11,6 +13,8 @@ export default function Cadastro() {
   const [erros, setErros] = useState({})
   const [erro, setErro] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [captcha, setCaptcha] = useState('')
+  const [chaveCaptcha, setChaveCaptcha] = useState(0)
 
   const mudar = (campo) => (evento) => setForm({ ...form, [campo]: evento.target.value })
 
@@ -21,11 +25,15 @@ export default function Cadastro() {
     setEnviando(true)
 
     try {
-      await cadastrar(form)
+      await cadastrar({ ...form, captcha })
     } catch (falha) {
       setErros(falha.erros)
-      if (Object.keys(falha.erros).length === 0) setErro(falha.message)
+      if (falha.erros.captcha) setErro(falha.erros.captcha[0])
+      else if (Object.keys(falha.erros).length === 0) setErro(falha.message)
       setEnviando(false)
+      // Cada token do captcha vale para um único envio.
+      setCaptcha('')
+      setChaveCaptcha((chave) => chave + 1)
     }
   }
 
@@ -61,7 +69,9 @@ export default function Cadastro() {
           <input type="password" value={form.password_confirmation} onChange={mudar('password_confirmation')} autoComplete="new-password" minLength={8} required />
         </label>
 
-        <button type="submit" className="botao" disabled={enviando}>
+        <Captcha key={chaveCaptcha} aoMudar={setCaptcha} aoFalhar={setErro} />
+
+        <button type="submit" className="botao" disabled={enviando || (CAPTCHA_ATIVO && !captcha)}>
           {enviando ? 'Criando…' : 'Criar conta'}
         </button>
 

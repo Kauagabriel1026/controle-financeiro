@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ConferirCaptcha;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Em produção a API fica atrás do proxy da hospedagem. Confiar nele faz
         // o Laravel enxergar o IP de quem chamou, usado no limite de tentativas.
         $middleware->trustProxies(at: '*');
+
+        $middleware->alias(['captcha' => ConferirCaptcha::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 
 import { api } from '../api.js'
 import Aviso from '../components/Aviso.jsx'
+import { CAPTCHA_ATIVO } from '../captcha.js'
+import Captcha from '../components/Captcha.jsx'
 import TelaDeEntrada from '../components/TelaDeEntrada.jsx'
 
 export default function EsqueciSenha() {
@@ -12,6 +14,8 @@ export default function EsqueciSenha() {
   const [erro, setErro] = useState('')
   const [enviado, setEnviado] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [captcha, setCaptcha] = useState('')
+  const [chaveCaptcha, setChaveCaptcha] = useState(0)
 
   async function enviar(evento) {
     evento.preventDefault()
@@ -19,10 +23,12 @@ export default function EsqueciSenha() {
     setEnviando(true)
 
     try {
-      const resposta = await api('/esqueci-senha', { metodo: 'POST', corpo: { email } })
+      const resposta = await api('/esqueci-senha', { metodo: 'POST', corpo: { email, captcha } })
       setEnviado(resposta.message)
     } catch (falha) {
-      setErro(falha.erros.email?.[0] ?? falha.message)
+      setErro(falha.erros.captcha?.[0] ?? falha.erros.email?.[0] ?? falha.message)
+      setCaptcha('')
+      setChaveCaptcha((chave) => chave + 1)
     } finally {
       setEnviando(false)
     }
@@ -45,7 +51,9 @@ export default function EsqueciSenha() {
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required autoFocus />
             </label>
 
-            <button type="submit" className="botao" disabled={enviando}>
+            <Captcha key={chaveCaptcha} aoMudar={setCaptcha} aoFalhar={setErro} />
+
+            <button type="submit" className="botao" disabled={enviando || (CAPTCHA_ATIVO && !captcha)}>
               {enviando ? 'Enviando…' : 'Enviar link'}
             </button>
           </>

@@ -122,16 +122,18 @@ Variáveis de ambiente da API:
 | `FRONT_URL` | Endereço do front-end, usado no link de redefinição de senha |
 | `BREVO_API_KEY` | Chave da API do [Brevo](https://www.brevo.com), que envia os e-mails |
 | `MAIL_FROM_ADDRESS` | Remetente dos e-mails, verificado no Brevo |
+| `TURNSTILE_SECRET_KEY` | Chave secreta do captcha da Cloudflare (Turnstile) |
 
 Variável de ambiente do front-end, lida no momento do build:
 
 | Variável | Para que serve |
 | --- | --- |
 | `VITE_API_URL` | Endereço da API, terminando em `/api` |
+| `VITE_TURNSTILE_SITE_KEY` | Chave do site do captcha da Cloudflare (Turnstile) |
 
 Em produção o front-end está no Vercel, a API no Render e o banco no Neon. O arquivo `render.yaml` descreve a API para o Render e o `web/vercel.json` configura o front-end no Vercel.
 
-Sem `BREVO_API_KEY`, nenhum e-mail é enviado. No ambiente local, o link de redefinição de senha aparece em `api/storage/logs/laravel.log`.
+Sem as chaves do Turnstile, o captcha não aparece nem é exigido; é assim no ambiente local e nos testes automáticos. Sem `BREVO_API_KEY`, nenhum e-mail é enviado. No ambiente local, o link de redefinição de senha aparece em `api/storage/logs/laravel.log`.
 
 ## Comandos úteis
 

@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
         await api('/perfil', { metodo: 'PUT', corpo: { tema } })
       },
       // Entra em uma conta de visitante, criada na hora com dados de exemplo.
-      demonstrar: async () => iniciar(await api('/demonstracao', { metodo: 'POST' })),
+      demonstrar: async (captcha) => iniciar(await api('/demonstracao', { metodo: 'POST', corpo: { captcha } })),
       // Sai na hora neste navegador e avisa a API em seguida. O pedido sai antes
       // de o token ser apagado e continua mesmo se a página for fechada.
       sair: async () => {

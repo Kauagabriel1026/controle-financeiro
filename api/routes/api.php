@@ -20,11 +20,12 @@ Route::get('/health', function () {
 });
 
 // Limite de 10 tentativas por minuto por IP, contra adivinhação de senha.
+// O captcha barra robôs nas rotas que criam contas, entram ou enviam e-mail.
 Route::middleware('throttle:10,1')->group(function () {
-    Route::post('/registrar', [AuthController::class, 'registrar']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/demonstracao', [AuthController::class, 'demonstracao']);
-    Route::post('/esqueci-senha', [RedefinicaoDeSenhaController::class, 'enviarLink']);
+    Route::post('/registrar', [AuthController::class, 'registrar'])->middleware('captcha');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('captcha');
+    Route::post('/demonstracao', [AuthController::class, 'demonstracao'])->middleware('captcha');
+    Route::post('/esqueci-senha', [RedefinicaoDeSenhaController::class, 'enviarLink'])->middleware('captcha');
     Route::post('/redefinir-senha', [RedefinicaoDeSenhaController::class, 'redefinir']);
 });
 

@@ -8,4 +8,10 @@ return [
         'remetente' => env('MAIL_FROM_ADDRESS'),
         'nome' => env('MAIL_FROM_NAME', 'Kamel Controle Financeiro'),
     ],
+
+    // Captcha da Cloudflare (Turnstile). Sem a chave secreta, o captcha não é
+    // exigido, como no ambiente local e nos testes automáticos.
+    'turnstile' => [
+        'chave_secreta' => env('TURNSTILE_SECRET_KEY'),
+    ],
 ];

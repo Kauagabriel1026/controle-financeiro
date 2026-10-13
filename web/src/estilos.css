@@ -734,6 +734,11 @@ select {
   font-size: 0.875rem;
 }
 
+/* Espaço reservado do captcha, para o botão não pular quando ele aparece. */
+.captcha {
+  min-height: 65px;
+}
+
 .entrada-form .esqueci {
   align-self: flex-end;
   margin-top: -0.5rem;

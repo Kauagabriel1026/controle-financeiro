@@ -26,3 +26,6 @@ services:
         sync: false
       - key: MAIL_FROM_ADDRESS
         sync: false
+      # Chave secreta do captcha da Cloudflare (Turnstile).
+      - key: TURNSTILE_SECRET_KEY
+        sync: false

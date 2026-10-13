@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 
 import { useAuth } from '../auth.jsx'
 import Aviso from '../components/Aviso.jsx'
+import { CAPTCHA_ATIVO } from '../captcha.js'
+import Captcha from '../components/Captcha.jsx'
 import TelaDeEntrada from '../components/TelaDeEntrada.jsx'
 
 export default function Login() {
@@ -14,6 +16,15 @@ export default function Login() {
   const [erro, setErro] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [demorando, setDemorando] = useState(false)
+  const [captcha, setCaptcha] = useState('')
+  // Trocar a chave recria o captcha: cada token vale para um único envio.
+  const [chaveCaptcha, setChaveCaptcha] = useState(0)
+  const aguardandoCaptcha = CAPTCHA_ATIVO && !captcha
+
+  function novoCaptcha() {
+    setCaptcha('')
+    setChaveCaptcha((chave) => chave + 1)
+  }
 
   // A hospedagem gratuita desliga a API quando ninguém usa; a primeira chamada
   // depois disso leva até um minuto. O aviso evita parecer que travou.
@@ -34,10 +45,11 @@ export default function Login() {
     setEnviando('login')
 
     try {
-      await entrar({ email, password })
+      await entrar({ email, password, captcha })
     } catch (falha) {
-      setErro(falha.erros.email?.[0] ?? falha.message)
+      setErro(falha.erros.captcha?.[0] ?? falha.erros.email?.[0] ?? falha.message)
       setEnviando(false)
+      novoCaptcha()
     }
   }
 
@@ -46,10 +58,11 @@ export default function Login() {
     setEnviando('demonstracao')
 
     try {
-      await demonstrar()
+      await demonstrar(captcha)
     } catch (falha) {
-      setErro(falha.message)
+      setErro(falha.erros.captcha?.[0] ?? falha.message)
       setEnviando(false)
+      novoCaptcha()
     }
   }
 
@@ -73,11 +86,13 @@ export default function Login() {
         </label>
         <Link className="esqueci" to="/esqueci-senha" state={{ email }}>Esqueci minha senha</Link>
 
-        <button type="submit" className="botao" disabled={Boolean(enviando)}>
+        <Captcha key={chaveCaptcha} aoMudar={setCaptcha} aoFalhar={setErro} />
+
+        <button type="submit" className="botao" disabled={Boolean(enviando) || aguardandoCaptcha}>
           {enviando === 'login' ? 'Entrando…' : 'Entrar'}
         </button>
 
-        <button type="button" className="botao secundario" disabled={Boolean(enviando)} onClick={verDemonstracao}>
+        <button type="button" className="botao secundario" disabled={Boolean(enviando) || aguardandoCaptcha} onClick={verDemonstracao}>
           {enviando === 'demonstracao' ? 'Preparando a demonstração…' : 'Ver demonstração'}
         </button>
         <p className="entrada-dica">Abre uma conta de visitante com dados de exemplo, sem cadastro.</p>
