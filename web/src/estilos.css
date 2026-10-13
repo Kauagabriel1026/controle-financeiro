@@ -692,11 +692,6 @@ select {
   color: var(--tinta-suave);
 }
 
-.entrada-projeto a {
-  color: var(--azul-escuro);
-  font-weight: 600;
-}
-
 .entrada-form {
   display: flex;
   flex-direction: column;
