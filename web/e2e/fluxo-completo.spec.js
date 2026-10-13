@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 
 import { expect, test } from '@playwright/test'
 
@@ -51,6 +51,24 @@ async function criarConta(page, { tipo, descricao, valor, vencimento, categoria,
   await janela.getByRole('button', { name: 'Salvar conta' }).click()
   await expect(janela).toBeHidden()
 }
+
+// Se o teste falhar, guarda o endereço, o texto da tela e as chamadas à API,
+// para o CI mostrar o que estava acontecendo.
+const chamadas = []
+
+test.beforeEach(({ page }) => {
+  page.on('request', (pedido) => pedido.url().includes('/api/') && chamadas.push(`-> ${pedido.method()} ${pedido.url()}`))
+  page.on('response', (resposta) => resposta.url().includes('/api/') && chamadas.push(`<- ${resposta.status()} ${resposta.url()}`))
+  page.on('requestfailed', (pedido) => chamadas.push(`xx ${pedido.url()} ${pedido.failure()?.errorText}`))
+})
+
+test.afterEach(async ({ page }, info) => {
+  if (info.status === info.expectedStatus) return
+
+  mkdirSync('test-results', { recursive: true })
+  const tela = await page.locator('body').innerText().catch(() => '(sem tela)')
+  writeFileSync('test-results/estado-da-tela.txt', `${page.url()}\n\n${tela}\n\n${chamadas.slice(-12).join('\n')}`)
+})
 
 test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', async ({ page }) => {
   // Qualquer erro de JavaScript na página reprova o teste. Respostas 4xx
@@ -219,8 +237,10 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(page.getByRole('alert')).toHaveText('E-mail ou senha inválidos.')
 
   // --- Esqueci minha senha: o link sai no log da API (sem serviço de e-mail no teste) ---
+  // A tela já vem com o e-mail digitado no login.
   await page.getByRole('link', { name: 'Esqueci minha senha' }).click()
-  await page.getByLabel('E-mail').fill(email)
+  await expect(page.getByRole('heading', { name: 'Esqueci minha senha' })).toBeVisible()
+  await expect(page.getByLabel('E-mail')).toHaveValue(email)
   await page.getByRole('button', { name: 'Enviar link' }).click()
   // Lê a confirmação ou o erro, para a falha mostrar o que a tela exibiu.
   await expect(page.locator('.entrada-form').getByRole('status').or(page.locator('.entrada-form').getByRole('alert'))).toContainText('Se o e-mail estiver cadastrado')

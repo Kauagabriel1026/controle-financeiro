@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { api } from '../api.js'
 import Aviso from '../components/Aviso.jsx'
 import TelaDeEntrada from '../components/TelaDeEntrada.jsx'
 
 export default function EsqueciSenha() {
-  const [email, setEmail] = useState('')
+  // Vindo do login, o e-mail já digitado lá preenche o campo.
+  const { state } = useLocation()
+  const [email, setEmail] = useState(state?.email ?? '')
   const [erro, setErro] = useState('')
   const [enviado, setEnviado] = useState('')
   const [enviando, setEnviando] = useState(false)

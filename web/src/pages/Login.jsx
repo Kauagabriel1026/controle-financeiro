@@ -71,7 +71,7 @@ export default function Login() {
           Senha
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
         </label>
-        <Link className="esqueci" to="/esqueci-senha">Esqueci minha senha</Link>
+        <Link className="esqueci" to="/esqueci-senha" state={{ email }}>Esqueci minha senha</Link>
 
         <button type="submit" className="botao" disabled={Boolean(enviando)}>
           {enviando === 'login' ? 'Entrando…' : 'Entrar'}
