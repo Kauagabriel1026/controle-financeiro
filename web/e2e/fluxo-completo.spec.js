@@ -250,6 +250,11 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await expect(page.getByLabel('Objetivo principal')).toHaveValue('montar_reserva')
   await expect(page.getByLabel('Quanto quer guardar por mês (R$)')).toHaveValue('800,00')
 
+  // Clicar no logo volta para o painel.
+  await page.getByRole('link', { name: 'Kamel Controle financeiro' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(nomeDoMes(hoje.slice(0, 7)))
+  await page.goto('/perfil')
+
   // O menu da conta também troca o tema.
   await page.getByRole('button', { name: 'Olá, Ana' }).click()
   await page.getByRole('menuitem', { name: 'Usar tema claro' }).click()

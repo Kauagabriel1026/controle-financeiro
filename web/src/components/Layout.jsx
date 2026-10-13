@@ -10,7 +10,7 @@ export default function Layout() {
   return (
     <div className="app">
       <aside className="lateral">
-        <Marca />
+        <Marca para="/" />
 
         <nav aria-label="Principal">
           <NavLink to="/" end>Painel</NavLink>

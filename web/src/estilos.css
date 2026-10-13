@@ -134,6 +134,11 @@ a {
   line-height: 1.15;
 }
 
+a.marca {
+  border-radius: var(--raio);
+  text-decoration: none;
+}
+
 .marca-simbolo {
   flex: none;
   width: 3rem;
