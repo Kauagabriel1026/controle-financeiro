@@ -139,6 +139,12 @@ jobs:
           php artisan migrate --force
           php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/servidor.log 2>&1 &
           curl --silent --fail --retry 15 --retry-delay 1 --retry-connrefused http://127.0.0.1:8000/api/health
+          # Diagnóstico temporário do esqueci minha senha.
+          json='-H Accept:application/json -H Content-Type:application/json'
+          curl -s -m 20 -X POST $json -d '{"name":"Diag","email":"diag@example.com","password":"senha-diag-123","password_confirmation":"senha-diag-123"}' http://127.0.0.1:8000/api/registrar -o /dev/null -w '%{http_code}\n'
+          r1=$(curl -s -m 25 -X POST $json -d '{"email":"diag@example.com"}' http://127.0.0.1:8000/api/esqueci-senha -w ' | %{http_code} %{time_total}s' 2>&1 | head -c 1500)
+          r2=$(curl -s -m 25 -X POST $json -d '{"email":"ninguem@example.com"}' http://127.0.0.1:8000/api/esqueci-senha -w ' | %{http_code} %{time_total}s' 2>&1 | head -c 600)
+          echo "::notice title=Diagnóstico esqueci-senha::cadastrado: ${r1//$'\n'/ } || inexistente: ${r2//$'\n'/ } || log: $(tail -c 800 storage/logs/laravel.log 2>/dev/null | tr '\n' ' ')"
 
       - name: Preparar o front-end
         working-directory: web
