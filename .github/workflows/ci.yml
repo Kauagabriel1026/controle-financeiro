@@ -155,7 +155,7 @@ jobs:
         if: failure()
         working-directory: api
         run: |
-          registro=$(tail -c 3000 storage/logs/laravel.log 2>/dev/null || echo "sem laravel.log")
+          registro=$( (tail -c 2000 storage/logs/laravel.log 2>/dev/null || echo "sem laravel.log"); echo; echo "--- servidor ---"; tail -n 25 storage/logs/servidor.log 2>/dev/null)
           registro="${registro//'%'/'%25'}"
           registro="${registro//$'\n'/'%0A'}"
           echo "::error title=Log da API::$registro"

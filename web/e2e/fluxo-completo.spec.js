@@ -222,7 +222,8 @@ test('fluxo completo: cadastro, categorias, contas, baixa, painel e sessão', as
   await page.getByRole('link', { name: 'Esqueci minha senha' }).click()
   await page.getByLabel('E-mail').fill(email)
   await page.getByRole('button', { name: 'Enviar link' }).click()
-  await expect(page.getByRole('status')).toContainText('Se o e-mail estiver cadastrado')
+  // Lê a confirmação ou o erro, para a falha mostrar o que a tela exibiu.
+  await expect(page.locator('.entrada-form').getByRole('status').or(page.locator('.entrada-form').getByRole('alert'))).toContainText('Se o e-mail estiver cadastrado')
 
   await page.goto(ultimoLinkDeRedefinicao())
   await expect(page.getByRole('heading', { name: 'Criar nova senha' })).toBeVisible()
