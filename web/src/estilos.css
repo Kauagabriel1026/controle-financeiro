@@ -63,9 +63,12 @@
   color-scheme: dark;
 }
 
-/* O logo é desenhado em azul-marinho; no escuro, vira branco. */
+/* O mascote mantém as cores originais em qualquer tema: no escuro, ganha
+   um selo branco por trás, como um ícone de aplicativo. */
 :root[data-tema='escuro'] .marca-simbolo {
-  filter: brightness(0) invert(1);
+  padding: 0.25rem;
+  border-radius: 22%;
+  background: #ffffff;
 }
 
 *,
